@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ingrédient{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="display-6">Ingrédient</h1>
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless">
+                <tbody>
+                <tr>
+                    <td class="text-right">Nom :</td>
+                    <td>{{ ingredient.name }}</td>
+                </tr>
+                <tr>
+                    <td class="text-right">Conservation :</td>
+                    <td>{{ ingredient.whereToKeepLabel }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
+
+            <a class="btn btn-primary"
+               href="{{ path('app_ingredient_edit', {'id': ingredient.id}) }}"
+               role="button"
+            >Modifier</a>
+
+            {{ include('ingredient/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{{ form_start(form) }}
+<div class="card">
+    <div class="card-header">
+        <h1 class="display-6">{{ title }}</h1>
+    </div>
+    <div class="card-body">
+        {{ form_errors(form) }}
+
+        {{ form_row(form.name) }}
+        {{ form_row(form.whereToKeep) }}
+    </div>
+    <div class="card-footer">
+        {{ form_label(form.save, submit_label) }}
+        {{ form_widget(form.save) }}
+        <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
+    </div>
+</div>
+{{ form_end(form) }}
