@@ -10,8 +10,7 @@
         {{ form_row(form.whereToKeep) }}
     </div>
     <div class="card-footer">
-        {{ form_label(form.save, submit_label) }}
-        {{ form_widget(form.save) }}
+        {{ form_widget(form.save, {'label': submit_label}) }}
         <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
     </div>
 </div>

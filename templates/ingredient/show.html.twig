@@ -22,14 +22,12 @@
             </table>
         </div>
         <div class="card-footer">
-            <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
-
             <a class="btn btn-primary"
                href="{{ path('app_ingredient_edit', {'id': ingredient.id}) }}"
                role="button"
             >Modifier</a>
 
-            {{ include('ingredient/_delete_form.html.twig') }}
+            <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
         </div>
     </div>
 {% endblock %}
