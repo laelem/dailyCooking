@@ -26,7 +26,6 @@ class IngredientType extends AbstractType
                     'class' => 'radio-inline',
                 ],
             ])
-//            ->add('category')
             ->add('save', SubmitType::class)
         ;
     }

@@ -33,8 +33,14 @@ class Ingredient
     #[ORM\OneToMany(mappedBy: 'ingredient', targetEntity: RecipeIngredient::class)]
     private Collection $recipeIngredients;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $category = null;
+    #[ORM\ManyToOne(inversedBy: 'category1Ingredients')]
+    private ?IngredientCategory $category1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'category2Ingredients')]
+    private ?IngredientCategory $category2 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'category3Ingredients')]
+    private ?IngredientCategory $category3 = null;
 
     public function __construct()
     {
@@ -105,14 +111,38 @@ class Ingredient
         return $this;
     }
 
-    public function getCategory(): ?string
+    public function getCategory1(): ?IngredientCategory
     {
-        return $this->category;
+        return $this->category1;
     }
 
-    public function setCategory(?string $category): self
+    public function setCategory1(?IngredientCategory $category1): self
     {
-        $this->category = $category;
+        $this->category1 = $category1;
+
+        return $this;
+    }
+
+    public function getCategory2(): ?IngredientCategory
+    {
+        return $this->category2;
+    }
+
+    public function setCategory2(?IngredientCategory $category2): self
+    {
+        $this->category2 = $category2;
+
+        return $this;
+    }
+
+    public function getCategory3(): ?IngredientCategory
+    {
+        return $this->category3;
+    }
+
+    public function setCategory3(?IngredientCategory $category3): self
+    {
+        $this->category3 = $category3;
 
         return $this;
     }
