@@ -8,7 +8,7 @@
         <h1 class="display-6">Liste des ingrédients</h1>
     </div>
     <div class="col">
-        <a class="btn btn-primary" href="{{ path('app_ingredient_new') }}" role="button">Nouvel ingrédient</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ path('app_ingredient_new') }}" role="button">Nouvel ingrédient</a>
     </div>
 </div>
 
@@ -16,26 +16,36 @@
     <div class="col">
         <div class="card text-bg-light my-2">
             <div class="card-body">
-                This is some text within a card body.
+                {{ include('ingredient/_filters.html.twig', {'pagination': pagination}) }}
             </div>
         </div>
     </div>
 </div>
 
+<div class="count mt-2 text-end">
+    <p>{{ pagination.getTotalItemCount }} ingrédient(s) trouvé(s)</p>
+</div>
+
 <div class="row">
     <div class="col">
-        <table class="table table-hover align-middle table-sm">
-            <thead>
-            <tr>
-                <th scope="col">Nom</th>
-                <th scope="col">Conservation</th>
-                <th scope="col">Actions</th>
-            </tr>
+        <table class="table table-hover align-middle table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" {% if pagination.isSorted('i.name') %}class="sorted"{% endif %}>
+                        {{ knp_pagination_sortable(pagination, 'Nom', 'i.name') }}
+                    </th>
+                    <th scope="col">
+                        {{ knp_pagination_sortable(pagination, 'Catégorie', ['c1.name', 'c2.name', 'c3.name']) }}
+                    </th>
+                    <th scope="col">Conservation</th>
+                    <th scope="col">Actions</th>
+                </tr>
             </thead>
             <tbody>
-            {% for ingredient in ingredients %}
+            {% for ingredient in pagination %}
                 <tr>
                     <td>{{ ingredient.name }}</td>
+                    <td>{{ ingredient.treeCategoryLabels }}</td>
                     <td>{{ ingredient.whereToKeepLabel }}</td>
                     <td>
                         <a class="btn btn-sm btn-outline-primary"
@@ -59,11 +69,15 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="3">Aucun ingrédient trouvé</td>
+                    <td colspan="4">Aucun ingrédient trouvé</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+
+        <div class="navigation">
+            {{ knp_pagination_render(pagination) }}
+        </div>
     </div>
 </div>
 {% endblock %}

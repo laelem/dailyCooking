@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Ingredient
 {
     const WHERE_TO_KEEP_OPTIONS = [
-        'je ne sais pas' => '',
+        '' => '',
         'placard' => 'closet',
         'frigidaire' => 'fridge',
     ];
@@ -145,5 +145,26 @@ class Ingredient
         $this->category3 = $category3;
 
         return $this;
+    }
+
+    public function getTreeCategoryLabels(): string
+    {
+        if (!$this->category1) {
+            return '';
+        }
+
+        $str = $this->category1->getName();
+
+        if (!$this->category2) {
+            return $str;
+        }
+
+        $str .= ' > ' . $this->category2->getName();
+
+        if (!$this->category3) {
+            return $str;
+        }
+
+        return $str . ' > ' . $this->category3->getName();
     }
 }

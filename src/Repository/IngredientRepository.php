@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Ingredient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +38,22 @@ class IngredientRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAllQuery(?string $filterName): Query
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->leftJoin('i.category1', 'c1')
+            ->leftJoin('i.category2', 'c2')
+            ->leftJoin('i.category3', 'c3')
+        ;
+
+        if ($filterName) {
+            $qb->andWhere('i.name LIKE :filterName')
+                ->setParameter('filterName', '%'.$filterName.'%');
+        }
+
+        return $qb->getQuery();
     }
 
 //    /**
