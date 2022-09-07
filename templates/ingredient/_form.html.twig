@@ -7,7 +7,9 @@
         {{ form_errors(form) }}
 
         {{ form_row(form.name) }}
+        {{ form_row(form.category) }}
         {{ form_row(form.whereToKeep) }}
+        {{ form_row(form.tags) }}
     </div>
     <div class="card-footer">
         {{ form_widget(form.save, {'label': submit_label}) }}

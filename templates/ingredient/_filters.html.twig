@@ -1,13 +1,34 @@
 <form method="get" action="{{ path('app_ingredient_index') }}" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" name="numItemsPerPage" value="{{ numItemsPerPage }}">
     <div class="mb-3 row">
         <label for="filterName" class="col-sm-2 col-form-label text-end">Nom</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="filterName" name="filterName" value="{{ filterName }}">
         </div>
     </div>
+    <div class="mb-3 row">
+        <label for="filterCategoryId" class="col-sm-2 col-form-label text-end">Catégorie</label>
+        <div class="col-sm-10">
+            <select class="form-select" id="filterCategoryId" name="filterCategoryId">
+                <option {% if filterCategoryId is empty %}selected{% endif %}>Toutes</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if filterCategoryId == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
     <div class="row justify-content-end">
         <div class="col-sm-10">
-            <button type="submit" class="btn btn-sm btn-outline-secondary">Filtrer</button>
+            <button type="submit" class="btn btn-sm btn-outline-primary">
+                Filtrer
+            </button>
+            <a class="btn btn-sm btn-outline-secondary"
+               href="{{ path('app_ingredient_index', {'numItemsPerPage': numItemsPerPage}) }}"
+            >
+                Réinitialiser
+            </a>
         </div>
     </div>
 </form>

@@ -12,8 +12,26 @@
                 <dt class="col-sm-2">Nom :</dt>
                 <dd class="col-sm-10">{{ ingredient.name }}</dd>
 
+                <dt class="col-sm-2">Catégorie :</dt>
+                <dd class="col-sm-10">{{ ingredient.category.name }}</dd>
+
+                <dt class="col-sm-2">Tags :</dt>
+                <dd class="col-sm-10">
+                    {% for tag in ingredient.tags %}
+                        <span class="badge bg-secondary fs-6 fw-normal">{{ tag.name }}</span>
+                    {% else %}
+                        <span class="badge text-bg-light">Aucun</span>
+                    {% endfor %}
+                </dd>
+
                 <dt class="col-sm-2">Conservation :</dt>
-                <dd class="col-sm-10">{{ ingredient.whereToKeepLabel }}</dd>
+                <dd class="col-sm-10">
+                    {% if ingredient.whereToKeepLabel  %}
+                        {{ ingredient.whereToKeepLabel }}
+                    {% else %}
+                        <span class="badge text-bg-light">Inconnue</span>
+                    {% endif %}
+                </dd>
             </dl>
         </div>
         <div class="card-footer">
@@ -22,7 +40,8 @@
                role="button"
             >Modifier</a>
 
-            <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
+            {% set referer = app.request.headers.get('referer')|default(path('app_ingredient_index')) %}
+            <a class="btn btn-secondary" href="{{ referer }}" role="button">Retour</a>
         </div>
     </div>
 {% endblock %}

@@ -40,18 +40,27 @@ class IngredientRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllQuery(?string $filterName): Query
+    public function findAllQuery(?string $filterName, ?int $filterCategoryId): Query
     {
         $qb = $this->createQueryBuilder('i')
-            ->leftJoin('i.category1', 'c1')
-            ->leftJoin('i.category2', 'c2')
-            ->leftJoin('i.category3', 'c3')
+            ->innerJoin('i.category', 'c')
+            ->leftJoin('i.tags', 't')
         ;
 
         if ($filterName) {
             $qb->andWhere('i.name LIKE :filterName')
                 ->setParameter('filterName', '%'.$filterName.'%');
         }
+
+        if ($filterCategoryId) {
+            $qb->andWhere('c.id = :filterCategoryId')
+                ->setParameter('filterCategoryId', $filterCategoryId);
+        }
+
+        $qb->groupBy('i.id')
+            ->orderBy('c.position')
+            ->addOrderBy('i.name')
+        ;
 
         return $qb->getQuery();
     }

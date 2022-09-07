@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Entity\Ingredient;
 use App\Entity\IngredientCategory;
+use App\Entity\IngredientTag;
+use App\Entity\Tag;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Console\Command\Command;
@@ -79,59 +81,73 @@ class FeedIngredientCommand extends Command
             ];
         }
 
-        $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
-        foreach ($ingredients as $ingredient) {
-            $this->entityManager->remove($ingredient);
-        }
-        $this->entityManager->flush();
-        $categories = $this->entityManager->getRepository(IngredientCategory::class)->findAll();
-        foreach ($categories as $category) {
-            $this->entityManager->remove($category);
-        }
-        $this->entityManager->flush();
+        $this->removeAll();
 
         $categoryRepo = $this->entityManager->getRepository(IngredientCategory::class);
+        $tagRepo = $this->entityManager->getRepository(Tag::class);
+        $cptCategory = 1;
+
         foreach ($ingredientsData as $ingredientRow) {
             $ingredient = (new Ingredient())->setName($ingredientRow['name']);
-            $category1 = $categoryRepo->findOneBy(['name' => $ingredientRow['category1'], 'category1' => null]);
-            if (!$category1) {
-                $category1 = (new IngredientCategory())->setName($ingredientRow['category1']);
-                $this->entityManager->persist($category1);
-                $this->entityManager->flush();
+
+            $category = $categoryRepo->findOneBy(['name' => $ingredientRow['category1']]);
+            if (!$category) {
+                $category = (new IngredientCategory())
+                    ->setName($ingredientRow['category1'])
+                    ->setPosition($cptCategory)
+                ;
+                $cptCategory++;
+                $this->entityManager->persist($category);
             }
-            $ingredient->setCategory1($category1);
-            if (isset($ingredientRow['category2'])) {
-                $category2 = $categoryRepo->findOneBy([
-                    'name' => $ingredientRow['category2'],
-                    'category1' => $category1,
-                ]);
+            $ingredient->setCategory($category);
+
+            if ($ingredientRow['category2']) {
+                $category2 = $tagRepo->findOneBy(['name' => $ingredientRow['category2']]);
                 if (!$category2) {
-                    $category2 = (new IngredientCategory())->setName($ingredientRow['category2'])
-                        ->setCategory1($category1);
+                    $category2 = (new Tag())->setName($ingredientRow['category2']);
                     $this->entityManager->persist($category2);
-                    $this->entityManager->flush();
                 }
-                $ingredient->setCategory2($category2);
+                $ingredientTag = (new IngredientTag())->setIngredient($ingredient)->setTag($category2);
+                $this->entityManager->persist($ingredientTag);
+                $ingredient->addIngredientTag($ingredientTag);
             }
-            if (isset($ingredientRow['category3'])) {
-                $category3 = $categoryRepo->findOneBy([
-                    'name' => $ingredientRow['category3'],
-                    'category1' => $category1,
-                    'category2' => $category2,
-                ]);
+
+            if ($ingredientRow['category3']) {
+                $category3 = $tagRepo->findOneBy(['name' => $ingredientRow['category3']]);
                 if (!$category3) {
-                    $category3 = (new IngredientCategory())->setName($ingredientRow['category3'])
-                        ->setCategory1($category1)
-                        ->setCategory2($category2);
+                    $category3 = (new Tag())->setName($ingredientRow['category3']);
                     $this->entityManager->persist($category3);
-                    $this->entityManager->flush();
                 }
-                $ingredient->setCategory3($category3);
+                $ingredientTag = (new IngredientTag())->setIngredient($ingredient)->setTag($category3);
+                $this->entityManager->persist($ingredientTag);
+                $ingredient->addIngredientTag($ingredientTag);
             }
+
             $this->entityManager->persist($ingredient);
             $this->entityManager->flush();
         }
 
         return Command::SUCCESS;
+    }
+
+    public function removeAll()
+    {
+        $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
+        foreach ($ingredients as $ingredient) {
+            $this->entityManager->remove($ingredient);
+        }
+        $categories = $this->entityManager->getRepository(IngredientCategory::class)->findAll();
+        foreach ($categories as $category) {
+            $this->entityManager->remove($category);
+        }
+        $ingredientTags = $this->entityManager->getRepository(IngredientTag::class)->findAll();
+        foreach ($ingredientTags as $ingredientTag) {
+            $this->entityManager->remove($ingredientTag);
+        }
+        $tags = $this->entityManager->getRepository(Tag::class)->findAll();
+        foreach ($tags as $tag) {
+            $this->entityManager->remove($tag);
+        }
+        $this->entityManager->flush();
     }
 }

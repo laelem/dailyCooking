@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Ingredient;
 use App\Form\IngredientType;
+use App\Repository\IngredientCategoryRepository;
 use App\Repository\IngredientRepository;
+use App\Repository\TagRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,32 +16,48 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/ingredient')]
 class IngredientController extends AbstractController
 {
+    const PER_PAGE_OPTIONS = [10, 25, 50, 100];
+    const DEFAULT_PER_PAGE_OPTION = 25;
+
     #[Route('/', name: 'app_ingredient_index', methods: ['GET'])]
     public function index(
         IngredientRepository $ingredientRepository,
+        IngredientCategoryRepository $ingredientCategoryRepository,
         PaginatorInterface $paginator,
         Request $request
     ): Response
     {
+        $numItemsPerPage = $request->query->getInt('numItemsPerPage', self::DEFAULT_PER_PAGE_OPTION);
         $filterName = $request->query->getAlpha('filterName');
+        $filterCategoryId = $request->query->getInt('filterCategoryId');
 
-        $query = $ingredientRepository->findAllQuery($filterName);
+        $categories = $ingredientCategoryRepository->findBy([], ['position' => 'asc']);
+
+        $query = $ingredientRepository->findAllQuery($filterName, $filterCategoryId);
 
         $pagination = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
-            10
+            $numItemsPerPage
         );
 
         return $this->render('ingredient/index.html.twig', [
             'ingredients' => $ingredientRepository->findAll(),
             'pagination' => $pagination,
+            'numItemsPerPage' => $numItemsPerPage,
+            'perPageOptions' => self::PER_PAGE_OPTIONS,
             'filterName' => $filterName,
+            'filterCategoryId' => $filterCategoryId,
+            'categories' => $categories,
         ]);
     }
 
     #[Route('/new', name: 'app_ingredient_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, IngredientRepository $ingredientRepository): Response
+    public function new(
+        Request $request,
+        IngredientRepository $ingredientRepository,
+        TagRepository $tagRepository
+    ): Response
     {
         $ingredient = new Ingredient();
         $form = $this->createForm(IngredientType::class, $ingredient);

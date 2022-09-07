@@ -12,9 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Ingredient
 {
     const WHERE_TO_KEEP_OPTIONS = [
-        '' => '',
-        'placard' => 'closet',
-        'frigidaire' => 'fridge',
+        'closet' => 'placard',
+        'fridge' => 'frigidaire',
     ];
 
     #[ORM\Id]
@@ -23,28 +22,27 @@ class Ingredient
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(message: 'Le nom de l\'ingrédient est requis.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Choice(choices: self::WHERE_TO_KEEP_OPTIONS)]
+    #[Assert\Choice(callback: 'getWhereToKeepOptions', message: 'Cette option n\'est pas valide.')]
     private ?string $whereToKeep = null;
 
     #[ORM\OneToMany(mappedBy: 'ingredient', targetEntity: RecipeIngredient::class)]
     private Collection $recipeIngredients;
 
-    #[ORM\ManyToOne(inversedBy: 'category1Ingredients')]
-    private ?IngredientCategory $category1 = null;
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?IngredientCategory $category = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category2Ingredients')]
-    private ?IngredientCategory $category2 = null;
-
-    #[ORM\ManyToOne(inversedBy: 'category3Ingredients')]
-    private ?IngredientCategory $category3 = null;
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'ingredients')]
+    private Collection $tags;
 
     public function __construct()
     {
         $this->recipeIngredients = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,9 +67,21 @@ class Ingredient
         return $this->whereToKeep;
     }
 
+    public static function getWhereToKeepOptions(): array
+    {
+        return array_flip(array_merge(
+          ['' => 'je ne sais pas'],
+          self::WHERE_TO_KEEP_OPTIONS
+        ));
+    }
+
     public function getWhereToKeepLabel(): ?string
     {
-        return array_flip(self::WHERE_TO_KEEP_OPTIONS)[$this->whereToKeep];
+        if ($this->whereToKeep) {
+            return self::WHERE_TO_KEEP_OPTIONS[$this->whereToKeep];
+        }
+
+        return null;
     }
 
     public function setWhereToKeep(?string $whereToKeep): self
@@ -111,60 +121,39 @@ class Ingredient
         return $this;
     }
 
-    public function getCategory1(): ?IngredientCategory
+    public function getCategory(): ?IngredientCategory
     {
-        return $this->category1;
+        return $this->category;
     }
 
-    public function setCategory1(?IngredientCategory $category1): self
+    public function setCategory(?IngredientCategory $category): self
     {
-        $this->category1 = $category1;
+        $this->category = $category;
 
         return $this;
     }
 
-    public function getCategory2(): ?IngredientCategory
+    /**
+     * @return Collection<int, Tag>
+     */
+    public function getTags(): Collection
     {
-        return $this->category2;
+        return $this->tags;
     }
 
-    public function setCategory2(?IngredientCategory $category2): self
+    public function addTag(Tag $tag): self
     {
-        $this->category2 = $category2;
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+        }
 
         return $this;
     }
 
-    public function getCategory3(): ?IngredientCategory
+    public function removeTag(Tag $tag): self
     {
-        return $this->category3;
-    }
-
-    public function setCategory3(?IngredientCategory $category3): self
-    {
-        $this->category3 = $category3;
+        $this->tags->removeElement($tag);
 
         return $this;
-    }
-
-    public function getTreeCategoryLabels(): string
-    {
-        if (!$this->category1) {
-            return '';
-        }
-
-        $str = $this->category1->getName();
-
-        if (!$this->category2) {
-            return $str;
-        }
-
-        $str .= ' > ' . $this->category2->getName();
-
-        if (!$this->category3) {
-            return $str;
-        }
-
-        return $str . ' > ' . $this->category3->getName();
     }
 }

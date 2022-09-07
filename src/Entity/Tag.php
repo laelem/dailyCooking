@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\IngredientCategoryRepository;
+use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: IngredientCategoryRepository::class)]
-class IngredientCategory
+#[ORM\Entity(repositoryClass: TagRepository::class)]
+class Tag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,11 +18,8 @@ class IngredientCategory
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Ingredient::class)]
+    #[ORM\ManyToMany(targetEntity: Ingredient::class, mappedBy: 'tags')]
     private Collection $ingredients;
-
-    #[ORM\Column]
-    private ?float $position = null;
 
     public function __construct()
     {
@@ -46,6 +43,11 @@ class IngredientCategory
         return $this;
     }
 
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
     /**
      * @return Collection<int, Ingredient>
      */
@@ -58,7 +60,7 @@ class IngredientCategory
     {
         if (!$this->ingredients->contains($ingredient)) {
             $this->ingredients->add($ingredient);
-            $ingredient->setCategory($this);
+            $ingredient->addTag($this);
         }
 
         return $this;
@@ -67,29 +69,9 @@ class IngredientCategory
     public function removeIngredient(Ingredient $ingredient): self
     {
         if ($this->ingredients->removeElement($ingredient)) {
-            // set the owning side to null (unless already changed)
-            if ($ingredient->getCategory() === $this) {
-                $ingredient->setCategory(null);
-            }
+            $ingredient->removeTag($this);
         }
 
         return $this;
-    }
-
-    public function getPosition(): ?float
-    {
-        return $this->position;
-    }
-
-    public function setPosition(float $position): self
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-    public function __toString(): string
-    {
-        return $this->name;
     }
 }
