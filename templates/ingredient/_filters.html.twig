@@ -1,16 +1,19 @@
 <form method="get" action="{{ path('app_ingredient_index') }}" enctype="application/x-www-form-urlencoded">
     <input type="hidden" name="numItemsPerPage" value="{{ numItemsPerPage }}">
-    <div class="mb-3 row">
-        <label for="filterName" class="col-sm-2 col-form-label text-end">Nom</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="filterName" name="filterName" value="{{ filterName }}">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <label for="filterName" class="col-form-label pe-0">Nom</label>
         </div>
-    </div>
-    <div class="mb-3 row">
-        <label for="filterCategoryId" class="col-sm-2 col-form-label text-end">Catégorie</label>
-        <div class="col-sm-10">
-            <select class="form-select" id="filterCategoryId" name="filterCategoryId">
-                <option {% if filterCategoryId is empty %}selected{% endif %}>Toutes</option>
+        <div class="col-auto">
+            <input type="text" size="30" class="form-control form-control-sm" id="filterName" name="filterName" value="{{ filterName }}">
+        </div>
+
+        <div class="col-auto">
+            <label for="filterCategoryId" class="col-form-label pe-0">Catégorie</label>
+        </div>
+        <div class="col-auto">
+            <select class="form-select form-select-sm" id="filterCategoryId" name="filterCategoryId">
+                <option value="" {% if filterCategoryId is empty %}selected{% endif %}>Toutes</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}" {% if filterCategoryId == category.id %}selected{% endif %}>
                         {{ category.name }}
@@ -18,9 +21,29 @@
                 {% endfor %}
             </select>
         </div>
-    </div>
-    <div class="row justify-content-end">
-        <div class="col-sm-10">
+
+        <div class="col-auto">
+            <label for="filterTags" class="col-form-label pe-0">Tags (séparés par une virgule)</label>
+        </div>
+        <div class="col-auto">
+            <input type="text" size="30" class="form-control form-control-sm" id="filterTags" name="filterTags" value="{{ filterTags }}">
+        </div>
+
+        <div class="col-auto">
+            <label for="filterWhereToKeep" class="col-form-label pe-0">Conservation</label>
+        </div>
+        <div class="col-auto">
+            <select class="form-select form-select-sm" id="filterWhereToKeep" name="filterWhereToKeep">
+                <option value="" {% if filterWhereToKeep is empty %}selected{% endif %}>Indifférent</option>
+                {% for whereToKeepOptionKey, whereToKeepOptionValue in whereToKeepOptions %}
+                    <option value="{{ whereToKeepOptionKey }}" {% if filterWhereToKeep == whereToKeepOptionKey %}selected{% endif %}>
+                        {{ whereToKeepOptionValue }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-auto">
             <button type="submit" class="btn btn-sm btn-outline-primary">
                 Filtrer
             </button>
@@ -29,6 +52,15 @@
             >
                 Réinitialiser
             </a>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Afficher/masquer les tags
+            </button>
+        </div>
+    </div>
+
+    <div class="collapse mt-3" id="collapseExample">
+        <div class="card card-body">
+            Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
         </div>
     </div>
 </form>

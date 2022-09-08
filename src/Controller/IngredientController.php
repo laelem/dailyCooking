@@ -28,12 +28,15 @@ class IngredientController extends AbstractController
     ): Response
     {
         $numItemsPerPage = $request->query->getInt('numItemsPerPage', self::DEFAULT_PER_PAGE_OPTION);
+
         $filterName = $request->query->getAlpha('filterName');
         $filterCategoryId = $request->query->getInt('filterCategoryId');
+        $filterTags = $request->query->get('filterTags');
+        $filterWhereToKeep = $request->query->getAlpha('filterWhereToKeep');
 
         $categories = $ingredientCategoryRepository->findBy([], ['position' => 'asc']);
 
-        $query = $ingredientRepository->findAllQuery($filterName, $filterCategoryId);
+        $query = $ingredientRepository->findAllQuery($filterName, $filterCategoryId, $filterTags, $filterWhereToKeep);
 
         $pagination = $paginator->paginate(
             $query,
@@ -42,13 +45,16 @@ class IngredientController extends AbstractController
         );
 
         return $this->render('ingredient/index.html.twig', [
-            'ingredients' => $ingredientRepository->findAll(),
-            'pagination' => $pagination,
-            'numItemsPerPage' => $numItemsPerPage,
-            'perPageOptions' => self::PER_PAGE_OPTIONS,
-            'filterName' => $filterName,
-            'filterCategoryId' => $filterCategoryId,
-            'categories' => $categories,
+            'ingredients'        => $ingredientRepository->findAll(),
+            'pagination'         => $pagination,
+            'numItemsPerPage'    => $numItemsPerPage,
+            'perPageOptions'     => self::PER_PAGE_OPTIONS,
+            'filterName'         => $filterName,
+            'filterCategoryId'   => $filterCategoryId,
+            'filterTags'         => $filterTags,
+            'filterWhereToKeep'  => $filterWhereToKeep,
+            'categories'         => $categories,
+            'whereToKeepOptions' => Ingredient::WHERE_TO_KEEP_OPTIONS,
         ]);
     }
 

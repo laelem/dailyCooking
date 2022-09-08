@@ -4,7 +4,6 @@ namespace App\Command;
 
 use App\Entity\Ingredient;
 use App\Entity\IngredientCategory;
-use App\Entity\IngredientTag;
 use App\Entity\Tag;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -27,7 +26,7 @@ class FeedIngredientCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $data = file_get_contents(__DIR__.'/../Feed/Ingredients.txt');
+        $data = file_get_contents(__DIR__.'/../Feed/Ingredients_v2.txt');
         $rows = explode(PHP_EOL, $data);
 
         $res = [];
@@ -107,9 +106,7 @@ class FeedIngredientCommand extends Command
                     $category2 = (new Tag())->setName($ingredientRow['category2']);
                     $this->entityManager->persist($category2);
                 }
-                $ingredientTag = (new IngredientTag())->setIngredient($ingredient)->setTag($category2);
-                $this->entityManager->persist($ingredientTag);
-                $ingredient->addIngredientTag($ingredientTag);
+                $ingredient->addTag($category2);
             }
 
             if ($ingredientRow['category3']) {
@@ -118,9 +115,7 @@ class FeedIngredientCommand extends Command
                     $category3 = (new Tag())->setName($ingredientRow['category3']);
                     $this->entityManager->persist($category3);
                 }
-                $ingredientTag = (new IngredientTag())->setIngredient($ingredient)->setTag($category3);
-                $this->entityManager->persist($ingredientTag);
-                $ingredient->addIngredientTag($ingredientTag);
+                $ingredient->addTag($category3);
             }
 
             $this->entityManager->persist($ingredient);
@@ -139,10 +134,6 @@ class FeedIngredientCommand extends Command
         $categories = $this->entityManager->getRepository(IngredientCategory::class)->findAll();
         foreach ($categories as $category) {
             $this->entityManager->remove($category);
-        }
-        $ingredientTags = $this->entityManager->getRepository(IngredientTag::class)->findAll();
-        foreach ($ingredientTags as $ingredientTag) {
-            $this->entityManager->remove($ingredientTag);
         }
         $tags = $this->entityManager->getRepository(Tag::class)->findAll();
         foreach ($tags as $tag) {

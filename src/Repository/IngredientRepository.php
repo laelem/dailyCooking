@@ -40,24 +40,49 @@ class IngredientRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllQuery(?string $filterName, ?int $filterCategoryId): Query
+    public function findAllQuery(
+        ?string $filterName,
+        ?int $filterCategoryId,
+        ?string $filterTags,
+        ?string $filterWhereToKeep
+    ): Query
     {
         $qb = $this->createQueryBuilder('i')
             ->innerJoin('i.category', 'c')
             ->leftJoin('i.tags', 't')
         ;
 
+        $parameters = [];
+
         if ($filterName) {
-            $qb->andWhere('i.name LIKE :filterName')
-                ->setParameter('filterName', '%'.$filterName.'%');
+            $qb->andWhere('i.name LIKE :filterName');
+            $parameters['filterName'] = '%'.$filterName.'%';
         }
 
         if ($filterCategoryId) {
-            $qb->andWhere('c.id = :filterCategoryId')
-                ->setParameter('filterCategoryId', $filterCategoryId);
+            $qb->andWhere('c.id = :filterCategoryId');
+            $parameters['filterCategoryId'] = $filterCategoryId;
         }
 
-        $qb->groupBy('i.id')
+        if ($filterWhereToKeep) {
+            $qb->andWhere('i.whereToKeep = :filterWhereToKeep');
+            $parameters['filterWhereToKeep'] = $filterWhereToKeep;
+        }
+
+        if ($filterTags) {
+            $tags = explode(',', $filterTags);
+            if (!empty($tags)) {
+                $tagsConditions = [];
+                foreach($tags as $i => $tag) {
+                    $tagsConditions[] = 'LOWER(t.name) = :filterTag'.$i;
+                    $parameters['filterTag'.$i] = strtolower(trim($tag));
+                }
+                $qb->andWhere(implode(' OR ', $tagsConditions));
+            }
+        }
+
+        $qb->setParameters($parameters)
+            ->groupBy('i.id')
             ->orderBy('c.position')
             ->addOrderBy('i.name')
         ;
