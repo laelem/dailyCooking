@@ -23,18 +23,20 @@ class IngredientController extends AbstractController
     public function index(
         IngredientRepository $ingredientRepository,
         IngredientCategoryRepository $ingredientCategoryRepository,
+        TagRepository $tagRepository,
         PaginatorInterface $paginator,
         Request $request
     ): Response
     {
         $numItemsPerPage = $request->query->getInt('numItemsPerPage', self::DEFAULT_PER_PAGE_OPTION);
 
-        $filterName = $request->query->getAlpha('filterName');
+        $filterName = $request->query->get('filterName');
         $filterCategoryId = $request->query->getInt('filterCategoryId');
         $filterTags = $request->query->get('filterTags');
-        $filterWhereToKeep = $request->query->getAlpha('filterWhereToKeep');
+        $filterWhereToKeep = $request->query->get('filterWhereToKeep');
 
         $categories = $ingredientCategoryRepository->findBy([], ['position' => 'asc']);
+        $tags = $tagRepository->findBy([], ['name' => 'asc']);
 
         $query = $ingredientRepository->findAllQuery($filterName, $filterCategoryId, $filterTags, $filterWhereToKeep);
 
@@ -54,6 +56,7 @@ class IngredientController extends AbstractController
             'filterTags'         => $filterTags,
             'filterWhereToKeep'  => $filterWhereToKeep,
             'categories'         => $categories,
+            'tags'               => $tags,
             'whereToKeepOptions' => Ingredient::WHERE_TO_KEEP_OPTIONS,
         ]);
     }

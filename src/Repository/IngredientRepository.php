@@ -70,7 +70,7 @@ class IngredientRepository extends ServiceEntityRepository
         }
 
         if ($filterTags) {
-            $tags = explode(',', $filterTags);
+            $tags = explode(';', $filterTags);
             if (!empty($tags)) {
                 $tagsConditions = [];
                 foreach($tags as $i => $tag) {

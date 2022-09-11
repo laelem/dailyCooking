@@ -37,6 +37,7 @@ class Ingredient
     private ?IngredientCategory $category = null;
 
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'ingredients')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $tags;
 
     public function __construct()

@@ -36,7 +36,7 @@ class IngredientType extends AbstractType
                     return $er->createQueryBuilder('t')->orderBy('t.name', 'ASC');
                 },
                 'multiple' => true,
-                'expanded' => true,
+                'attr' => ['class' => 'select2'],
             ])
             ->add('whereToKeep', ChoiceType::class, [
                 'label' => 'Conservation',
