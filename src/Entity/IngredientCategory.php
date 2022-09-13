@@ -6,16 +6,28 @@ use App\Repository\IngredientCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IngredientCategoryRepository::class)]
 class IngredientCategory
 {
+    const POSITION_FIRST = 'first';
+    const POSITION_LAST = 'last';
+    const POSITION_AFTER = 'after';
+
+    const POSITION_ENUM_CHOICES = [
+        'En premier'         => self::POSITION_FIRST,
+        'En dernier'         => self::POSITION_LAST,
+        'Après la catégorie' => self::POSITION_AFTER,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom de la catégorie est requise.")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Ingredient::class)]
@@ -23,6 +35,13 @@ class IngredientCategory
 
     #[ORM\Column]
     private ?float $position = null;
+
+    #[Assert\Choice(choices: self::POSITION_ENUM_CHOICES, message: "Cette option n'est pas valide.")]
+    private ?string $positionEnum = self::POSITION_LAST;
+
+    #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.")]
+    #[Assert\NotNull(groups: ['categoryBasedPosition'], message: "Vous devez indiquer une catégorie.")]
+    private ?IngredientCategory $beforeCategory = null;
 
     public function __construct()
     {
@@ -84,6 +103,30 @@ class IngredientCategory
     public function setPosition(float $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getBeforeCategory(): ?IngredientCategory
+    {
+        return $this->beforeCategory;
+    }
+
+    public function setBeforeCategory(?IngredientCategory $beforeCategory): IngredientCategory
+    {
+        $this->beforeCategory = $beforeCategory;
+
+        return $this;
+    }
+
+    public function getPositionEnum(): ?string
+    {
+        return $this->positionEnum;
+    }
+
+    public function setPositionEnum(?string $positionEnum): IngredientCategory
+    {
+        $this->positionEnum = $positionEnum;
 
         return $this;
     }

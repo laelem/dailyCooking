@@ -7,6 +7,8 @@
         {{ form_errors(form) }}
 
         {{ form_row(form.name) }}
+        {{ form_row(form.positionEnum) }}
+        {{ form_row(form.beforeCategory) }}
     </div>
     <div class="card-footer">
         {{ form_widget(form.save, {'label': submit_label}) }}

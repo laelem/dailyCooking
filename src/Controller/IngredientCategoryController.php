@@ -29,6 +29,7 @@ class IngredientCategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->managePosition($category, $ingredientCategoryRepository);
             $ingredientCategoryRepository->add($category, true);
 
             return $this->redirectToRoute('app_ingredient_category_index', [], Response::HTTP_SEE_OTHER);
@@ -43,7 +44,15 @@ class IngredientCategoryController extends AbstractController
     #[Route('/{id}/edit', name: 'app_ingredient_category_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, IngredientCategory $category, IngredientCategoryRepository $ingredientCategoryRepository): Response
     {
-        $form = $this->createForm(IngredientCategoryType::class, $category);
+        $beforeCategory = $ingredientCategoryRepository->findBeforeCategory($category);
+        if ($beforeCategory) {
+            $category->setPositionEnum(IngredientCategory::POSITION_AFTER);
+            $category->setBeforeCategory($beforeCategory);
+        } else {
+            $category->setPositionEnum(IngredientCategory::POSITION_FIRST);
+        }
+
+        $form = $this->createForm(IngredientCategoryType::class, $category, ['currentCategoryId' => $category->getId()]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -66,5 +75,23 @@ class IngredientCategoryController extends AbstractController
         }
 
         return $this->redirectToRoute('app_ingredient_category_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function managePosition(IngredientCategory $category, IngredientCategoryRepository $repository)
+    {
+        switch ($category->getPositionEnum()) {
+            case 'first':
+                $category->setPosition($repository->findFirstCategoryPosition() - 1);
+                break;
+            case 'last':
+                $category->setPosition($repository->findLastCategoryPosition() + 1);
+                break;
+            case 'after':
+                $res = $repository->findCategoryPositionWithNextOne($category->getBeforeCategory());
+                $pos1 = $res[0]['position'];
+                $pos2 = isset($res[1]) ? $res[1]['position'] : $pos1+1;
+                $category->setPosition(($pos1+$pos2)/2);
+                break;
+        }
     }
 }

@@ -54,13 +54,48 @@ class IngredientCategoryRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?IngredientCategory
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findFirstCategoryPosition(): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT MIN(position) FROM ingredient_category';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+
+        return $resultSet->fetchOne();
+    }
+
+    public function findLastCategoryPosition(): float
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT MAX(position) FROM ingredient_category';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+
+        return $resultSet->fetchOne();
+    }
+
+    public function findCategoryPositionWithNextOne(IngredientCategory $category): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT position FROM ingredient_category WHERE position >= :position ORDER BY position LIMIT 2';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['position' => $category->getPosition()]);
+
+        return $resultSet->fetchAllAssociative();
+    }
+
+    public function findBeforeCategory(IngredientCategory $category): ?IngredientCategory
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.position < :position')
+            ->setParameter('position', $category->getPosition())
+            ->addOrderBy('c.position', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
