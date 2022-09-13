@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle catégorie d'ingrédient{% endblock %}
+
+{% block content %}
+    {{ include('ingredient_category/_form.html.twig', {
+        'title': 'Nouvelle catégorie d\'ingrédient',
+        'submit_label': 'Créer'
+    }) }}
+{% endblock %}

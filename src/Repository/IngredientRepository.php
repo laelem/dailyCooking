@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Ingredient;
+use App\Entity\IngredientFilters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,12 +41,7 @@ class IngredientRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllQuery(
-        ?string $filterName,
-        ?int $filterCategoryId,
-        ?string $filterTags,
-        ?string $filterWhereToKeep
-    ): Query
+    public function findAllQuery(IngredientFilters $ingredientFilters): Query
     {
         $qb = $this->createQueryBuilder('i')
             ->innerJoin('i.category', 'c')
@@ -54,31 +50,28 @@ class IngredientRepository extends ServiceEntityRepository
 
         $parameters = [];
 
-        if ($filterName) {
+        if ($ingredientFilters->getName()) {
             $qb->andWhere('i.name LIKE :filterName');
-            $parameters['filterName'] = '%'.$filterName.'%';
+            $parameters['filterName'] = '%'.$ingredientFilters->getName().'%';
         }
 
-        if ($filterCategoryId) {
+        if ($ingredientFilters->getCategory()) {
             $qb->andWhere('c.id = :filterCategoryId');
-            $parameters['filterCategoryId'] = $filterCategoryId;
+            $parameters['filterCategoryId'] = $ingredientFilters->getCategory()->getId();
         }
 
-        if ($filterWhereToKeep) {
+        if ($ingredientFilters->getWhereToKeep()) {
             $qb->andWhere('i.whereToKeep = :filterWhereToKeep');
-            $parameters['filterWhereToKeep'] = $filterWhereToKeep;
+            $parameters['filterWhereToKeep'] = $ingredientFilters->getWhereToKeep();
         }
 
-        if ($filterTags) {
-            $tags = explode(';', $filterTags);
-            if (!empty($tags)) {
-                $tagsConditions = [];
-                foreach($tags as $i => $tag) {
-                    $tagsConditions[] = 'LOWER(t.name) = :filterTag'.$i;
-                    $parameters['filterTag'.$i] = strtolower(trim($tag));
-                }
-                $qb->andWhere(implode(' OR ', $tagsConditions));
+        if ($ingredientFilters->getTags()->count() > 0) {
+            $tagsConditions = [];
+            foreach($ingredientFilters->getTags() as $i => $tag) {
+                $tagsConditions[] = 'LOWER(t.name) = :filterTag'.$i;
+                $parameters['filterTag'.$i] = strtolower(trim($tag->getName()));
             }
+            $qb->andWhere(implode(' OR ', $tagsConditions));
         }
 
         $qb->setParameters($parameters)

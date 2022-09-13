@@ -1,72 +1,24 @@
-<form method="get" action="{{ path('app_ingredient_index') }}" enctype="application/x-www-form-urlencoded">
-    <input type="hidden" name="numItemsPerPage" value="{{ numItemsPerPage }}">
-    <div class="row align-items-center">
-        <label for="filterName" class="col-sm-2 col-form-label text-end">Nom</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control form-control-sm" id="filterName" name="filterName" value="{{ filterName }}">
-        </div>
-    </div>
+{% form_theme formFilters 'bootstrap_5_horizontal_layout.html.twig' %}
 
-    <div class="row align-items-center">
-        <label for="filterCategoryId" class="col-sm-2 col-form-label text-end">Catégorie</label>
-        <div class="col-sm-10">
-            <select class="form-select form-select-sm" id="filterCategoryId" name="filterCategoryId">
-                <option value="" {% if filterCategoryId is empty %}selected{% endif %}>Toutes</option>
-                {% for category in categories %}
-                    <option value="{{ category.id }}" {% if filterCategoryId == category.id %}selected{% endif %}>
-                        {{ category.name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
+{{ form_start(formFilters) }}
 
-    <div class="row align-items-center">
-        <label for="filterTags" class="col-sm-2 col-form-label text-end">Tags (séparés par un point-virgule)</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control form-control-sm" id="filterTags" name="filterTags" value="{{ filterTags }}">
-        </div>
-    </div>
+{{ form_row(formFilters.name) }}
+{{ form_row(formFilters.category) }}
+{{ form_row(formFilters.tags) }}
+{{ form_row(formFilters.whereToKeep) }}
 
-    <div class="row align-items-center">
-        <label for="filterWhereToKeep" class="col-sm-2 col-form-label text-end">Conservation</label>
-        <div class="col-sm-10">
-            <select class="form-select form-select-sm" id="filterWhereToKeep" name="filterWhereToKeep">
-                <option value="" {% if filterWhereToKeep is empty %}selected{% endif %}>Indifférent</option>
-                {% for whereToKeepOptionKey, whereToKeepOptionValue in whereToKeepOptions %}
-                    <option value="{{ whereToKeepOptionKey }}" {% if filterWhereToKeep == whereToKeepOptionKey %}selected{% endif %}>
-                        {{ whereToKeepOptionValue }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
+<input type="hidden" name="numItemsPerPage" value="{{ numItemsPerPage }}">
 
-    <div class="row align-items-center justify-content-end mt-2">
-        <div class="col-sm-10">
-            <button type="submit" class="btn btn-sm btn-outline-primary">
-                Filtrer
-            </button>
-            <a class="btn btn-sm btn-outline-secondary"
-               href="{{ path('app_ingredient_index', {'numItemsPerPage': numItemsPerPage}) }}"
-            >
-                Réinitialiser
-            </a>
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTags" aria-expanded="false" aria-controls="collapseTags">
-                Afficher/masquer les tags
-            </button>
-        </div>
-    </div>
+<div class="row align-items-center justify-content-end mt-2">
+    <div class="col-sm-10">
+        {{ form_widget(formFilters.save) }}
 
-    <div class="collapse mt-3" id="collapseTags">
-        <div class="card card-body">
-            <div class="row">
-                {% for tag in tags %}
-                    <div class="col-2">{{ tag.name }}</div>
-                {% else %}
-                    <div class="col-auto">Aucun tag trouvé</div>
-                {% endfor %}
-            </div>
-        </div>
+        <a class="btn btn-sm btn-outline-secondary"
+           href="{{ path('app_ingredient_index', {'numItemsPerPage': numItemsPerPage}) }}"
+        >
+            Réinitialiser
+        </a>
     </div>
-</form>
+</div>
+
+{{ form_end(formFilters) }}

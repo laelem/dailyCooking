@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Ingredient
 {
     const WHERE_TO_KEEP_OPTIONS = [
-        'closet' => 'placard',
-        'fridge' => 'frigidaire',
+        'closet' => 'Placard',
+        'fridge' => 'Frigidaire',
     ];
 
     #[ORM\Id]
@@ -71,7 +71,7 @@ class Ingredient
     public static function getWhereToKeepOptions(): array
     {
         return array_flip(array_merge(
-          ['' => 'je ne sais pas'],
+          ['' => 'Je ne sais pas'],
           self::WHERE_TO_KEEP_OPTIONS
         ));
     }

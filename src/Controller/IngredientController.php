@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Ingredient;
+use App\Entity\IngredientFilters;
+use App\Form\IngredientFiltersType;
 use App\Form\IngredientType;
 use App\Repository\IngredientCategoryRepository;
 use App\Repository\IngredientRepository;
@@ -22,23 +24,17 @@ class IngredientController extends AbstractController
     #[Route('/', name: 'app_ingredient_index', methods: ['GET'])]
     public function index(
         IngredientRepository $ingredientRepository,
-        IngredientCategoryRepository $ingredientCategoryRepository,
-        TagRepository $tagRepository,
         PaginatorInterface $paginator,
         Request $request
     ): Response
     {
         $numItemsPerPage = $request->query->getInt('numItemsPerPage', self::DEFAULT_PER_PAGE_OPTION);
 
-        $filterName = $request->query->get('filterName');
-        $filterCategoryId = $request->query->getInt('filterCategoryId');
-        $filterTags = $request->query->get('filterTags');
-        $filterWhereToKeep = $request->query->get('filterWhereToKeep');
+        $ingredientFilters = new IngredientFilters();
+        $formFilters = $this->createForm(IngredientFiltersType::class, $ingredientFilters, ['method' => 'GET']);
+        $formFilters->handleRequest($request);
 
-        $categories = $ingredientCategoryRepository->findBy([], ['position' => 'asc']);
-        $tags = $tagRepository->findBy([], ['name' => 'asc']);
-
-        $query = $ingredientRepository->findAllQuery($filterName, $filterCategoryId, $filterTags, $filterWhereToKeep);
+        $query = $ingredientRepository->findAllQuery($ingredientFilters);
 
         $pagination = $paginator->paginate(
             $query,
@@ -51,22 +47,13 @@ class IngredientController extends AbstractController
             'pagination'         => $pagination,
             'numItemsPerPage'    => $numItemsPerPage,
             'perPageOptions'     => self::PER_PAGE_OPTIONS,
-            'filterName'         => $filterName,
-            'filterCategoryId'   => $filterCategoryId,
-            'filterTags'         => $filterTags,
-            'filterWhereToKeep'  => $filterWhereToKeep,
-            'categories'         => $categories,
-            'tags'               => $tags,
-            'whereToKeepOptions' => Ingredient::WHERE_TO_KEEP_OPTIONS,
+            'ingredientFilters'  => $ingredientFilters,
+            'formFilters'        => $formFilters->createView(),
         ]);
     }
 
     #[Route('/new', name: 'app_ingredient_new', methods: ['GET', 'POST'])]
-    public function new(
-        Request $request,
-        IngredientRepository $ingredientRepository,
-        TagRepository $tagRepository
-    ): Response
+    public function new(Request $request, IngredientRepository $ingredientRepository): Response
     {
         $ingredient = new Ingredient();
         $form = $this->createForm(IngredientType::class, $ingredient);

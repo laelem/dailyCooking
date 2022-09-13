@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une catégorie d'ingrédient{% endblock %}
+
+{% block content %}
+    {{ include('ingredient_category/_form.html.twig', {
+        'title': 'Modifier une catégorie d\'ingrédient',
+        'submit_label': 'Modifier'
+    }) }}
+{% endblock %}
