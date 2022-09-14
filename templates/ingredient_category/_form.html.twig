@@ -7,8 +7,17 @@
         {{ form_errors(form) }}
 
         {{ form_row(form.name) }}
-        {{ form_row(form.positionEnum) }}
-        {{ form_row(form.beforeCategory) }}
+
+        {{ form_label(form.positionEnum) }}
+
+        <div class="row align-items-center">
+            <div class="col-auto pe-0">
+                {{ form_widget(form.positionEnum) }}
+            </div>
+            <div class="col-auto ps-0">
+                {{ form_row(form.beforeCategory) }}
+            </div>
+        </div>
     </div>
     <div class="card-footer">
         {{ form_widget(form.save, {'label': submit_label}) }}

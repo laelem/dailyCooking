@@ -25,9 +25,12 @@ class IngredientCategoryType extends AbstractType
                 'label' => 'Position',
                 'choices' => IngredientCategory::POSITION_ENUM_CHOICES,
                 'expanded' => true,
+                'label_attr' => ['class' => 'radio-inline'],
             ])
             ->add('beforeCategory', EntityType::class, [
                 'label' => 'Catégorie',
+                'label_attr' => ['class' => 'visually-hidden'],
+                'row_attr' => ['class' => 'mb-0'],
                 'required' => false,
                 'class' => IngredientCategory::class,
                 'query_builder' => function (EntityRepository $er) use ($options) {
@@ -50,14 +53,16 @@ class IngredientCategoryType extends AbstractType
             'data_class' => IngredientCategory::class,
             'currentCategoryId' => null,
             'validation_groups' => function (FormInterface $form) {
+                $groups = ['Default'];
+
                 /** @var IngredientCategory $data */
                 $data = $form->getData();
 
                 if (IngredientCategory::POSITION_AFTER == $data->getPositionEnum()) {
-                    return ['categoryBasedPosition'];
+                    $groups[] = 'categoryBasedPosition';
                 }
 
-                return ['Default'];
+                return $groups;
             },
         ]);
     }

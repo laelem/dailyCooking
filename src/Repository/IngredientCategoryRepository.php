@@ -39,50 +39,64 @@ class IngredientCategoryRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return IngredientCategory[] Returns an array of IngredientCategory objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-    public function findFirstCategoryPosition(): float
+    public function findFirstCategoryPosition(?IngredientCategory $excludedCategory = null): float
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = 'SELECT MIN(position) FROM ingredient_category';
+        $params = [];
+
+        if ($excludedCategory) {
+            $sql .= ' WHERE id <> :categoryId';
+            $params['categoryId'] = $excludedCategory->getId();
+        }
+
         $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery();
+        $resultSet = $stmt->executeQuery($params);
 
         return $resultSet->fetchOne();
     }
 
-    public function findLastCategoryPosition(): float
+    public function findLastCategoryPosition(?IngredientCategory $excludedCategory = null): float
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = 'SELECT MAX(position) FROM ingredient_category';
+        $params = [];
+
+        if ($excludedCategory) {
+            $sql .= ' WHERE id <> :categoryId';
+            $params['categoryId'] = $excludedCategory->getId();
+        }
+
         $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery();
+        $resultSet = $stmt->executeQuery($params);
 
         return $resultSet->fetchOne();
     }
 
-    public function findCategoryPositionWithNextOne(IngredientCategory $category): array
+    public function findCategoryPositionWithNextOne(
+        IngredientCategory $category,
+        ?IngredientCategory $excludedCategory = null
+    ): array
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = 'SELECT position FROM ingredient_category WHERE position >= :position ORDER BY position LIMIT 2';
+        $conditions = ['position >= :position'];
+        $params = ['position' => $category->getPosition()];
+
+        if ($excludedCategory) {
+            $conditions[] = 'id <> :categoryId';
+            $params['categoryId'] = $excludedCategory->getId();
+        }
+
+        $sql = sprintf(
+            'SELECT position FROM ingredient_category WHERE %s ORDER BY position LIMIT 2',
+            implode(' AND ', $conditions)
+        );
+
         $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery(['position' => $category->getPosition()]);
+        $resultSet = $stmt->executeQuery($params);
 
         return $resultSet->fetchAllAssociative();
     }

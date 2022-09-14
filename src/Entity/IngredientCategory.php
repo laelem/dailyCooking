@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: IngredientCategoryRepository::class)]
 class IngredientCategory
@@ -39,8 +40,8 @@ class IngredientCategory
     #[Assert\Choice(choices: self::POSITION_ENUM_CHOICES, message: "Cette option n'est pas valide.")]
     private ?string $positionEnum = self::POSITION_LAST;
 
-    #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.")]
-    #[Assert\NotNull(groups: ['categoryBasedPosition'], message: "Vous devez indiquer une catégorie.")]
+    #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.", groups: ['categoryBasedPosition'])]
+    #[Assert\NotNull(message: "Vous devez indiquer une catégorie.", groups: ['categoryBasedPosition'])]
     private ?IngredientCategory $beforeCategory = null;
 
     public function __construct()
@@ -134,5 +135,15 @@ class IngredientCategory
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context)
+    {
+        if ($this->getId() && $this->getBeforeCategory() && $this->getBeforeCategory()->getId() == $this->getId()) {
+            $context->buildViolation("Cette catégorie n'est pas valide.")
+                ->atPath('beforeCategory')
+                ->addViolation();
+        }
     }
 }
