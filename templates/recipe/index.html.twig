@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des recettes{% endblock %}
+
+{% block content %}
+<div class="row row-cols-auto align-items-center">
+    <div class="col">
+        <h1 class="display-6">Liste des recettes</h1>
+    </div>
+    <div class="col">
+        <a class="btn btn-sm btn-outline-primary" href="{{ path('app_recipe_new') }}" role="button">Nouvelle recette</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card text-bg-light my-2">
+            <div class="card-body">
+                {{ include('recipe/_filters.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2 mb-3 align-items-center">
+    <div class="col">
+        {% if pagination.getTotalItemCount == 0 %}
+            Aucune recette trouvée
+        {% elseif pagination.getTotalItemCount == 1 %}
+            1 recette trouvée
+        {% else %}
+            {{ pagination.getTotalItemCount|number_format }} recettes trouvées
+        {% endif %}
+    </div>
+    <div class="col text-end">
+        {{ include('recipe/_items_per_page.html.twig') }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <table class="table table-hover align-middle table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" {% if pagination.isSorted('r.title') %}class="sorted"{% endif %}>
+                        {{ knp_pagination_sortable(pagination, 'Recette', 'r.title') }}
+                    </th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for recipe in pagination %}
+                <tr>
+                    <td>{{ recipe.title }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="{{ path('app_recipe_show', {'id': recipe.id}) }}"
+                        >
+                            voir
+                        </a>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           href="{{ path('app_recipe_edit', {'id': recipe.id}) }}"
+                        >
+                            modifier
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#modalDeleteRecipe{{ recipe.id }}"
+                        >
+                            supprimer
+                        </button>
+
+                        {{ include('recipe/_delete_form.html.twig', {'recipe': recipe}) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">Aucune recette trouvée</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="navigation">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

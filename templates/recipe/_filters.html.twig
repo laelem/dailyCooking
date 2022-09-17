@@ -1,0 +1,21 @@
+{% form_theme formFilters 'bootstrap_5_horizontal_layout.html.twig' %}
+
+{{ form_start(formFilters) }}
+
+{{ form_row(formFilters.title) }}
+
+<input type="hidden" name="numItemsPerPage" value="{{ numItemsPerPage }}">
+
+<div class="row align-items-center justify-content-end mt-2">
+    <div class="col-sm-10">
+        {{ form_widget(formFilters.save) }}
+
+        <a class="btn btn-sm btn-outline-secondary"
+           href="{{ path('app_recipe_index', {'numItemsPerPage': numItemsPerPage}) }}"
+        >
+            Réinitialiser
+        </a>
+    </div>
+</div>
+
+{{ form_end(formFilters) }}

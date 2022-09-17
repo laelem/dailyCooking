@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle recette{% endblock %}
+
+{% block content %}
+    {{ include('recipe/_form.html.twig', {
+        'title': 'Nouvelle recette',
+        'submit_label': 'Créer'
+    }) }}
+{% endblock %}

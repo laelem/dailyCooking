@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recette{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="display-6">Recette</h1>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-2">Titre :</dt>
+                <dd class="col-sm-10">{{ recipe.title }}</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a class="btn btn-primary"
+               href="{{ path('app_recipe_edit', {'id': recipe.id}) }}"
+               role="button"
+            >Modifier</a>
+
+            {% set referer = app.request.headers.get('referer')|default(path('app_recipe_index')) %}
+            <a class="btn btn-secondary" href="{{ referer }}" role="button">Retour</a>
+        </div>
+    </div>
+{% endblock %}

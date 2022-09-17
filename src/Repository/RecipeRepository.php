@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\IngredientFilters;
 use App\Entity\Recipe;
+use App\Entity\RecipeFilters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,28 +42,22 @@ class RecipeRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Recipe[] Returns an array of Recipe objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findAllQuery(RecipeFilters $recipeFilters): Query
+    {
+        $qb = $this->createQueryBuilder('r');
 
-//    public function findOneBySomeField($value): ?Recipe
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $parameters = [];
+
+        if ($recipeFilters->getTitle()) {
+            $qb->andWhere('r.title LIKE :filterName');
+            $parameters['filterName'] = '%'.$recipeFilters->getTitle().'%';
+        }
+
+        $qb->setParameters($parameters)
+            ->groupBy('r.id')
+            ->orderBy('r.title')
+        ;
+
+        return $qb->getQuery();
+    }
 }

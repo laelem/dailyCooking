@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une recette{% endblock %}
+
+{% block content %}
+    {{ include('recipe/_form.html.twig', {
+        'title': 'Modifier une recette',
+        'submit_label': 'Modifier'
+    }) }}
+{% endblock %}

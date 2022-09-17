@@ -1,0 +1,26 @@
+<span>Nombre de recettes par page : </span>
+
+<nav aria-label="Nombre de recettes affichées par page" class="d-inline-block">
+    <ul class="pagination mb-0">
+        {% for perPageOption in perPageOptions %}
+            {% if numItemsPerPage == perPageOption %}
+                <li class="page-item active">
+                    <span class="page-link">
+                        {{ perPageOption }}
+                    </span>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{
+                        path('app_recipe_index', app.request.query.all|merge({
+                            'numItemsPerPage': perPageOption,
+                            'page': 1
+                        }))
+                    }}">
+                        {{ perPageOption }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</nav>

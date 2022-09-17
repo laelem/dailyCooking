@@ -19,7 +19,7 @@ class Recipe
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 65535)]
+    #[ORM\Column(type: Types::TEXT, length: 65535, nullable: true)]
     private ?string $steps = null;
 
     #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredient::class)]
@@ -52,7 +52,7 @@ class Recipe
         return $this->steps;
     }
 
-    public function setSteps(string $steps): self
+    public function setSteps(?string $steps): self
     {
         $this->steps = $steps;
 

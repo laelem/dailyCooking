@@ -15,14 +15,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link {{ current_route == 'app_recipe_index' ? 'active' : '' }}"#}
-{#                       href="{{ path('app_recipe_index') }}"#}
-{#                            {{ current_route == 'app_recipe_index' ? 'aria-current="page"' : '' }}#}
-{#                    >#}
-{#                        Recettes#}
-{#                    </a>#}
-{#                </li>#}
+                <li class="nav-item">
+                    <a class="nav-link {{ current_route == 'app_recipe_index' ? 'active' : '' }}"
+                       href="{{ path('app_recipe_index') }}"
+                            {{ current_route == 'app_recipe_index' ? 'aria-current="page"' : '' }}
+                    >
+                        Recettes
+                    </a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {{ current_route starts with 'app_ingredient' ? 'active' : '' }}"
                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
