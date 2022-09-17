@@ -57,14 +57,14 @@ class IngredientFilters
     }
 
     /**
-     * @return Collection<int, Tag>
+     * @return Collection<int, IngredientTag>
      */
     public function getTags(): Collection
     {
         return $this->tags;
     }
 
-    public function addTag(Tag $tag): self
+    public function addTag(IngredientTag $tag): self
     {
         if (!$this->tags->contains($tag)) {
             $this->tags->add($tag);
@@ -73,7 +73,7 @@ class IngredientFilters
         return $this;
     }
 
-    public function removeTag(Tag $tag): self
+    public function removeTag(IngredientTag $tag): self
     {
         $this->tags->removeElement($tag);
 

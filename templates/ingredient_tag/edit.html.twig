@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un tag d'ingrédient{% endblock %}
+
+{% block content %}
+    {{ include('ingredient_tag/_form.html.twig', {
+        'title': 'Modifier un tag d\'ingrédient',
+        'submit_label': 'Modifier'
+    }) }}
+{% endblock %}

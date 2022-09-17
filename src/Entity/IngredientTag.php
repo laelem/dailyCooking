@@ -2,20 +2,24 @@
 
 namespace App\Entity;
 
-use App\Repository\TagRepository;
+use App\Repository\IngredientTagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[ORM\Entity(repositoryClass: TagRepository::class)]
-class Tag
+#[ORM\Entity(repositoryClass: IngredientTagRepository::class)]
+#[UniqueEntity(fields: ['name'], message: "Ce tag existe déjà.")]
+class IngredientTag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: "Le nom du tag est requis.")]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Ingredient::class, mappedBy: 'tags')]

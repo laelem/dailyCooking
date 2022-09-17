@@ -32,7 +32,7 @@
                         <li>
                             <a class="dropdown-item {{ current_route == 'app_ingredient_index' ? 'active' : '' }}"
                                href="{{ path('app_ingredient_index') }}"
-                                {{ current_route == 'app_ingredient_index' ? 'aria-current="page"' : '' }}
+                                    {{ current_route == 'app_ingredient_index' ? 'aria-current="page"' : '' }}
                             >
                                 Ingrédients
                             </a>
@@ -40,13 +40,18 @@
                         <li>
                             <a class="dropdown-item {{ current_route == 'app_ingredient_category_index' ? 'active' : '' }}"
                                href="{{ path('app_ingredient_category_index') }}"
-                                {{ current_route == 'app_ingredient_category_index' ? 'aria-current="page"' : '' }}
+                                    {{ current_route == 'app_ingredient_category_index' ? 'aria-current="page"' : '' }}
                             >
                                 Catégories
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">Tags</a>
+                            <a class="dropdown-item {{ current_route == 'app_ingredient_tag_index' ? 'active' : '' }}"
+                               href="{{ path('app_ingredient_tag_index') }}"
+                                    {{ current_route == 'app_ingredient_tag_index' ? 'aria-current="page"' : '' }}
+                            >
+                                Tags
+                            </a>
                         </li>
                     </ul>
                 </li>

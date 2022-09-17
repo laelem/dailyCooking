@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Ingredient;
 
 use App\Entity\IngredientCategory;
 use App\Form\IngredientCategoryType;
@@ -15,9 +15,9 @@ class IngredientCategoryController extends AbstractController
 {
     private IngredientCategoryRepository $repository;
 
-    public function __construct(IngredientCategoryRepository $ingredientCategoryRepository)
+    public function __construct(IngredientCategoryRepository $repository)
     {
-        $this->repository = $ingredientCategoryRepository;
+        $this->repository = $repository;
     }
 
     #[Route('/', name: 'app_ingredient_category_index', methods: ['GET'])]
@@ -78,7 +78,10 @@ class IngredientCategoryController extends AbstractController
     #[Route('/{id}', name: 'app_ingredient_category_delete', methods: ['POST'])]
     public function delete(Request $request, IngredientCategory $category): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
+        if (
+            $this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))
+            && 0 === $category->getIngredients()->count()
+        ) {
             $this->repository->remove($category, true);
         }
 

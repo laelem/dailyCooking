@@ -36,7 +36,7 @@ class Ingredient
     #[ORM\JoinColumn(nullable: false)]
     private ?IngredientCategory $category = null;
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'ingredients')]
+    #[ORM\ManyToMany(targetEntity: IngredientTag::class, inversedBy: 'ingredients')]
     #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $tags;
 
@@ -135,14 +135,14 @@ class Ingredient
     }
 
     /**
-     * @return Collection<int, Tag>
+     * @return Collection<int, IngredientTag>
      */
     public function getTags(): Collection
     {
         return $this->tags;
     }
 
-    public function addTag(Tag $tag): self
+    public function addTag(IngredientTag $tag): self
     {
         if (!$this->tags->contains($tag)) {
             $this->tags->add($tag);
@@ -151,7 +151,7 @@ class Ingredient
         return $this;
     }
 
-    public function removeTag(Tag $tag): self
+    public function removeTag(IngredientTag $tag): self
     {
         $this->tags->removeElement($tag);
 

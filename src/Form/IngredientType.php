@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\Ingredient;
 use App\Entity\IngredientCategory;
-use App\Entity\Tag;
+use App\Entity\IngredientTag;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -32,7 +32,7 @@ class IngredientType extends AbstractType
             ->add('tags', EntityType::class, [
                 'label' => 'Tags',
                 'required' => false,
-                'class' => Tag::class,
+                'class' => IngredientTag::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')->orderBy('t.name', 'ASC');
                 },

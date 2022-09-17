@@ -24,7 +24,13 @@
 
 <div class="row mt-2 mb-3 align-items-center">
     <div class="col">
-        {{ pagination.getTotalItemCount }} ingrédient(s) trouvé(s)
+        {% if pagination.getTotalItemCount == 0 %}
+            Aucun ingrédient trouvé
+        {% elseif pagination.getTotalItemCount == 1 %}
+            1 ingrédient trouvé
+        {% else %}
+            {{ pagination.getTotalItemCount|number_format }} ingrédients trouvés
+        {% endif %}
     </div>
     <div class="col text-end">
         {{ include('ingredient/_items_per_page.html.twig') }}

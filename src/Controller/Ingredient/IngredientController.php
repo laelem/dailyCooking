@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Ingredient;
 
 use App\Entity\Ingredient;
 use App\Entity\IngredientFilters;
 use App\Form\IngredientFiltersType;
 use App\Form\IngredientType;
-use App\Repository\IngredientCategoryRepository;
 use App\Repository\IngredientRepository;
-use App\Repository\TagRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,12 +19,15 @@ class IngredientController extends AbstractController
     const PER_PAGE_OPTIONS = [10, 25, 50, 100];
     const DEFAULT_PER_PAGE_OPTION = 25;
 
+    private IngredientRepository $repository;
+
+    public function __construct(IngredientRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     #[Route('/', name: 'app_ingredient_index', methods: ['GET'])]
-    public function index(
-        IngredientRepository $ingredientRepository,
-        PaginatorInterface $paginator,
-        Request $request
-    ): Response
+    public function index(PaginatorInterface $paginator, Request $request): Response
     {
         $numItemsPerPage = $request->query->getInt('numItemsPerPage', self::DEFAULT_PER_PAGE_OPTION);
 
@@ -34,7 +35,7 @@ class IngredientController extends AbstractController
         $formFilters = $this->createForm(IngredientFiltersType::class, $ingredientFilters, ['method' => 'GET']);
         $formFilters->handleRequest($request);
 
-        $query = $ingredientRepository->findAllQuery($ingredientFilters);
+        $query = $this->repository->findAllQuery($ingredientFilters);
 
         $pagination = $paginator->paginate(
             $query,
@@ -43,7 +44,7 @@ class IngredientController extends AbstractController
         );
 
         return $this->render('ingredient/index.html.twig', [
-            'ingredients'        => $ingredientRepository->findAll(),
+            'ingredients'        => $this->repository->findAll(),
             'pagination'         => $pagination,
             'numItemsPerPage'    => $numItemsPerPage,
             'perPageOptions'     => self::PER_PAGE_OPTIONS,
@@ -53,14 +54,14 @@ class IngredientController extends AbstractController
     }
 
     #[Route('/new', name: 'app_ingredient_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, IngredientRepository $ingredientRepository): Response
+    public function new(Request $request): Response
     {
         $ingredient = new Ingredient();
         $form = $this->createForm(IngredientType::class, $ingredient);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $ingredientRepository->add($ingredient, true);
+            $this->repository->add($ingredient, true);
 
             return $this->redirectToRoute('app_ingredient_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -80,13 +81,13 @@ class IngredientController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_ingredient_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Ingredient $ingredient, IngredientRepository $ingredientRepository): Response
+    public function edit(Request $request, Ingredient $ingredient): Response
     {
         $form = $this->createForm(IngredientType::class, $ingredient);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $ingredientRepository->add($ingredient, true);
+            $this->repository->add($ingredient, true);
 
             return $this->redirectToRoute('app_ingredient_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -98,10 +99,10 @@ class IngredientController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_ingredient_delete', methods: ['POST'])]
-    public function delete(Request $request, Ingredient $ingredient, IngredientRepository $ingredientRepository): Response
+    public function delete(Request $request, Ingredient $ingredient): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ingredient->getId(), $request->request->get('_token'))) {
-            $ingredientRepository->remove($ingredient, true);
+            $this->repository->remove($ingredient, true);
         }
 
         return $this->redirectToRoute('app_ingredient_index', [], Response::HTTP_SEE_OTHER);
