@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un type de quantité{% endblock %}
+
+{% block content %}
+    {{ include('quantity_type/_form.html.twig', {
+        'title': 'Modifier un type de quantité',
+        'submit_label': 'Modifier'
+    }) }}
+{% endblock %}

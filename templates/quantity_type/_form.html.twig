@@ -7,14 +7,11 @@
         {{ form_errors(form) }}
 
         {{ form_row(form.name) }}
-        {{ form_row(form.category) }}
-        {{ form_row(form.defaultQuantityType) }}
-        {{ form_row(form.whereToKeep) }}
-        {{ form_row(form.tags) }}
+        {{ form_row(form.plural_name) }}
     </div>
     <div class="card-footer">
         {{ form_widget(form.save, {'label': submit_label}) }}
-        <a class="btn btn-secondary" href="{{ path('app_ingredient_index') }}" role="button">Retour</a>
+        <a class="btn btn-secondary" href="{{ path('app_quantity_type_index') }}" role="button">Retour</a>
     </div>
 </div>
 {{ form_end(form) }}

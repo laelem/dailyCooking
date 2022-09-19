@@ -7,10 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
 {
+    const PORTION_MAX = 20;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -19,15 +22,22 @@ class Recipe
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 65535, nullable: true)]
-    private ?string $steps = null;
-
-    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredient::class)]
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredient::class, cascade: ['persist', 'remove'])]
     private Collection $recipeIngredients;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, options: ["unsigned" => true])]
+    #[Assert\Type(type: 'integer', message: 'Le nombre de portions doit être un nombre.')]
+    #[Assert\Positive(message: "Le nombre de portions doit être un nombre positif.")]
+    #[Assert\LessThanOrEqual(value: self::PORTION_MAX, message: "Le nombre de portions ne peut excéder {{ compared_value }}.")]
+    private ?int $defaultPortionNumber = null;
+
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeStep::class, cascade: ['persist', 'remove'])]
+    private Collection $recipeSteps;
 
     public function __construct()
     {
         $this->recipeIngredients = new ArrayCollection();
+        $this->recipeSteps = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -43,18 +53,6 @@ class Recipe
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getSteps(): ?string
-    {
-        return $this->steps;
-    }
-
-    public function setSteps(?string $steps): self
-    {
-        $this->steps = $steps;
 
         return $this;
     }
@@ -83,6 +81,48 @@ class Recipe
             // set the owning side to null (unless already changed)
             if ($recipeIngredient->getRecipe() === $this) {
                 $recipeIngredient->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDefaultPortionNumber(): ?int
+    {
+        return $this->defaultPortionNumber;
+    }
+
+    public function setDefaultPortionNumber(?int $defaultPortionNumber): self
+    {
+        $this->defaultPortionNumber = $defaultPortionNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipeStep>
+     */
+    public function getRecipeSteps(): Collection
+    {
+        return $this->recipeSteps;
+    }
+
+    public function addRecipeStep(RecipeStep $recipeStep): self
+    {
+        if (!$this->recipeSteps->contains($recipeStep)) {
+            $this->recipeSteps->add($recipeStep);
+            $recipeStep->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipeStep(RecipeStep $recipeStep): self
+    {
+        if ($this->recipeSteps->removeElement($recipeStep)) {
+            // set the owning side to null (unless already changed)
+            if ($recipeStep->getRecipe() === $this) {
+                $recipeStep->setRecipe(null);
             }
         }
 

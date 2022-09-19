@@ -19,7 +19,8 @@ class IngredientTag
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Assert\NotBlank(message: "Le nom du tag est requis.")]
+    #[Assert\NotBlank(message: "Le nom du tag est requis.", normalizer: 'trim')]
+    #[Assert\Length(max: 255, maxMessage: "Le nom du tag ne peut excéder 255 caractères.")]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Ingredient::class, mappedBy: 'tags')]

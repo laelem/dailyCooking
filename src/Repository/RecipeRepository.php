@@ -60,4 +60,20 @@ class RecipeRepository extends ServiceEntityRepository
 
         return $qb->getQuery();
     }
+
+    public function findWithIngredients(int $recipeId)
+    {
+        return $this->createQueryBuilder('r')
+            ->addSelect('ri', 'i', 'c')
+            ->leftJoin('r.recipeIngredients', 'ri')
+            ->leftJoin('ri.ingredient', 'i')
+            ->leftJoin('i.category', 'c')
+            ->where('r.id = :recipeId')
+            ->setParameter('recipeId', $recipeId)
+            ->addOrderBy('c.position', 'ASC')
+            ->addOrderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }

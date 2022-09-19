@@ -28,16 +28,18 @@ class IngredientCategory
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le nom de la catégorie est requise.")]
+    #[Assert\NotBlank(message: "Le nom de la catégorie est requise.", normalizer: 'trim')]
+    #[Assert\Length(max: 255, maxMessage: "Le nom de la catégorie ne peut excéder 255 caractères.")]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Ingredient::class)]
     private Collection $ingredients;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ["unsigned" => true])]
     private ?float $position = null;
 
     #[Assert\Choice(choices: self::POSITION_ENUM_CHOICES, message: "Cette option n'est pas valide.")]
+    #[Assert\NotNull(message: "Vous devez indiquer une position.")]
     private ?string $positionEnum = self::POSITION_LAST;
 
     #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.", groups: ['categoryBasedPosition'])]

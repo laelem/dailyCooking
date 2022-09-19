@@ -22,7 +22,8 @@ class Ingredient
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Le nom de l\'ingrédient est requis.')]
+    #[Assert\NotBlank(message: 'Le nom de l\'ingrédient est requis.', normalizer: 'trim')]
+    #[Assert\Length(max: 255, maxMessage: "Le nom de l'ingrédient ne peut excéder 255 caractères.")]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -34,11 +35,20 @@ class Ingredient
 
     #[ORM\ManyToOne(inversedBy: 'ingredients')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'La catégorie est requise.')]
+    #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.")]
     private ?IngredientCategory $category = null;
 
     #[ORM\ManyToMany(targetEntity: IngredientTag::class, inversedBy: 'ingredients')]
     #[ORM\OrderBy(['name' => 'ASC'])]
+    #[Assert\Valid]
+    #[Assert\All([
+        new Assert\Type(type: IngredientTag::class, message: "Cette valeur n'est pas du bon type."),
+    ])]
     private Collection $tags;
+
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    private ?QuantityType $defaultQuantityType = null;
 
     public function __construct()
     {
@@ -156,5 +166,22 @@ class Ingredient
         $this->tags->removeElement($tag);
 
         return $this;
+    }
+
+    public function getDefaultQuantityType(): ?QuantityType
+    {
+        return $this->defaultQuantityType;
+    }
+
+    public function setDefaultQuantityType(?QuantityType $defaultQuantityType): self
+    {
+        $this->defaultQuantityType = $defaultQuantityType;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

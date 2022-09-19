@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Ingredient;
+namespace App\Controller;
 
 use App\Entity\Ingredient;
 use App\Entity\IngredientFilters;

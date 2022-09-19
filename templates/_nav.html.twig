@@ -53,6 +53,14 @@
                                 Tags
                             </a>
                         </li>
+                        <li>
+                            <a class="dropdown-item {{ current_route == 'app_quantity_type_index' ? 'active' : '' }}"
+                               href="{{ path('app_quantity_type_index') }}"
+                                    {{ current_route == 'app_quantity_type_index' ? 'aria-current="page"' : '' }}
+                            >
+                                Types de quantité
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>

@@ -1,0 +1,23 @@
+<div class="modal fade" id="modalDeleteQuantityType{{ quantityType.id }}" tabindex="-1"
+     aria-labelledby="Supprimer un type de quantité" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Supprimer un type de quantité">Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                Supprimer le type de quantité "{{ quantityType.name }}" ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post"
+                      action="{{ path('app_quantity_type_delete', {'id': quantityType.id}) }}"
+                >
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quantityType.id) }}">
+                    <button class="btn btn-primary">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

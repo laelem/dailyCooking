@@ -15,7 +15,14 @@
                 {{ form_widget(form.positionEnum) }}
             </div>
             <div class="col-auto ps-0">
-                {{ form_row(form.beforeCategory) }}
+                {{ form_label(form.beforeCategory) }}
+                {{ form_widget(form.beforeCategory) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-auto">
+                {{ form_errors(form.positionEnum) }}
+                {{ form_errors(form.beforeCategory) }}
             </div>
         </div>
     </div>

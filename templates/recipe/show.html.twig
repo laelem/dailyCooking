@@ -5,13 +5,35 @@
 {% block content %}
     <div class="card">
         <div class="card-header">
-            <h1 class="display-6">Recette</h1>
+            <h1 class="display-6">Recette : {{ recipe.title }}</h1>
         </div>
         <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-2">Titre :</dt>
-                <dd class="col-sm-10">{{ recipe.title }}</dd>
-            </dl>
+            <ul>
+            {% for recipeIngredient in recipe.recipeIngredients %}
+                <li>
+                    {{ recipeIngredient.ingredient.name }}
+                    {% if recipeIngredient.quantityNumber is not null %}
+                        -
+                        <strong>
+                            {{ recipeIngredient.quantityNumber|format_number }}
+                            {% if recipeIngredient.quantityType is not null %}
+                                {%
+                                    if recipeIngredient.quantityNumber > 1
+                                    and recipeIngredient.quantityType.pluralName is not null
+                                %}
+                                    {{ recipeIngredient.quantityType.pluralName }}
+                                {% else %}
+                                    {{ recipeIngredient.quantityType.name }}
+                                {% endif %}
+                            {% endif %}
+                        </strong>
+                    {% endif %}
+                    {% if recipeIngredient.comment is not null %}
+                        - {{ recipeIngredient.comment }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
         </div>
         <div class="card-footer">
             <a class="btn btn-primary"

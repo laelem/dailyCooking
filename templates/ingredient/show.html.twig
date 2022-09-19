@@ -13,12 +13,21 @@
                 <dd class="col-sm-10">{{ ingredient.name }}</dd>
 
                 <dt class="col-sm-2">Catégorie :</dt>
-                <dd class="col-sm-10">{{ ingredient.category.name }}</dd>
+                <dd class="col-sm-10">{{ ingredient.category }}</dd>
+
+                <dt class="col-sm-2">Type de quantité :</dt>
+                <dd class="col-sm-10">
+                    {% if ingredient.defaultQuantityType  %}
+                        {{ ingredient.defaultQuantityType }}
+                    {% else %}
+                        <span class="badge text-bg-light">Aucun</span>
+                    {% endif %}
+                </dd>
 
                 <dt class="col-sm-2">Tags :</dt>
                 <dd class="col-sm-10">
                     {% for tag in ingredient.tags %}
-                        <span class="badge bg-secondary fs-6 fw-normal">{{ tag.name }}</span>
+                        <span class="badge bg-secondary fs-6 fw-normal">{{ tag }}</span>
                     {% else %}
                         <span class="badge text-bg-light">Aucun</span>
                     {% endfor %}

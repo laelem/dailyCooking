@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Ingredient;
 use App\Entity\IngredientCategory;
 use App\Entity\IngredientTag;
+use App\Entity\QuantityType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -27,6 +28,14 @@ class IngredientType extends AbstractType
                 'class' => IngredientCategory::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')->orderBy('c.position', 'ASC');
+                },
+            ])
+            ->add('defaultQuantityType', EntityType::class, [
+                'label' => 'Type de quantité',
+                'required' => false,
+                'class' => QuantityType::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('q')->orderBy('q.name', 'ASC');
                 },
             ])
             ->add('tags', EntityType::class, [
