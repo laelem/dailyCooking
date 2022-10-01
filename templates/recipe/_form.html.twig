@@ -13,9 +13,9 @@
 {% endmacro %}
 
 {% macro printRecipeStepRow(recipeStep) %}
-    <div class="col-2 pe-1">{{ form_row(recipeStep.title) }}</div>
-    <div class="col-7 px-1">{{ form_row(recipeStep.description) }}</div>
-    <div class="col-1 px-1">
+    <div class="col-2 pe-1 align-self-start">{{ form_row(recipeStep.title) }}</div>
+    <div class="col-5 px-1">{{ form_row(recipeStep.description) }}</div>
+    <div class="col-1 px-1 my-1 align-self-end">
         <div class="d-grid">
             <button type="button" class="btn btn-outline-danger btn-sm subformDeleteButton">Supprimer</button>
         </div>
@@ -33,30 +33,32 @@
         {{ form_row(form.title) }}
         {{ form_row(form.defaultPortionNumber) }}
 
-        <div class="row align-items-center">
-            <div class="col-2 pe-1">Ingrédient</div>
-            <div class="col-1 px-1">Quantité</div>
-            <div class="col-2 px-1">Unité de mesure</div>
-            <div class="col-2 px-1">Commentaire</div>
-        </div>
+        <div>
+            <div class="row align-items-center">
+                <div class="col-2 pe-1">Ingrédient</div>
+                <div class="col-1 px-1">Quantité</div>
+                <div class="col-2 px-1">Unité de mesure</div>
+                <div class="col-7 px-1">Commentaire</div>
+            </div>
 
-        <div
-            data-index="{{ form.recipeIngredients|length > 0 ? form.recipeIngredients|last.vars.name + 1 : 0 }}"
-            data-prototype="{{ formMacros.printRecipeIngredientRow(form.recipeIngredients.vars.prototype)|e('html_attr') }}"
-            class="recipeIngredients subformItems mb-2"
-        >
-            {% for recipeIngredient in form.recipeIngredients %}
-                <div class="row align-items-center subformItem">
-                    {{ formMacros.printRecipeIngredientRow(recipeIngredient) }}
-                </div>
-            {% endfor %}
-        </div>
+            <div
+                data-index="{{ form.recipeIngredients|length > 0 ? form.recipeIngredients|last.vars.name + 1 : 0 }}"
+                data-prototype="{{ formMacros.printRecipeIngredientRow(form.recipeIngredients.vars.prototype)|e('html_attr') }}"
+                class="recipeIngredients subformItems mb-2"
+            >
+                {% for recipeIngredient in form.recipeIngredients %}
+                    <div class="row align-items-center subformItem">
+                        {{ formMacros.printRecipeIngredientRow(recipeIngredient) }}
+                    </div>
+                {% endfor %}
+            </div>
 
-        <div class="d-grid col-8">
-            <button type="button" class="btn btn-sm btn-outline-secondary add_item_link"
-                    data-collection-holder-class="recipeIngredients">
-                Ajouter un ingrédient
-            </button>
+            <div class="d-grid col-8">
+                <button type="button" class="btn btn-sm btn-outline-secondary add_item_link"
+                        data-collection-holder-class="recipeIngredients">
+                    Ajouter un ingrédient
+                </button>
+            </div>
         </div>
 
         <div
@@ -65,7 +67,7 @@
                 class="recipeSteps subformItems mb-2"
         >
             {% for recipeStep in form.recipeSteps %}
-                <div class="row align-items-center subformItem">
+                <div class="row subformItem">
                     {{ formMacros.printRecipeStepRow(recipeStep) }}
                 </div>
             {% endfor %}

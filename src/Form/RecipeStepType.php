@@ -18,11 +18,13 @@ class RecipeStepType extends AbstractType
                 'label' => "Titre de l'étape",
                 'label_attr' => ['class' => 'visually-hidden'],
                 'row_attr' => ['class' => 'my-1'],
+                'attr' => ['class' => 'form-control-sm'],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'label_attr' => ['class' => 'visually-hidden'],
                 'row_attr' => ['class' => 'my-1'],
+                'attr' => ['rows' => 6],
             ])
         ;
     }
