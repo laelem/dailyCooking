@@ -4,3 +4,12 @@
   display: inline-block;
   width: 25em;
 }
+
+.ingredients{
+  background-color: lighten($success, 60);
+}
+
+.steps h2{
+  font-weight: normal;
+  border-bottom: 1px solid #ddd;
+}

@@ -7,8 +7,13 @@
         <div class="card-header">
             <h1 class="display-6">Recette : {{ recipe.title }}</h1>
         </div>
+
         <div class="card-body">
-            <ul>
+            <p class="mb-0">Pour {{ recipe.defaultPortionNumber }} portion{{ recipe.defaultPortionNumber > 1 ? 's' : '' }} :</p>
+        </div>
+
+        <div class="card-body ingredients">
+            <ul class="mb-0">
             {% for recipeIngredient in recipe.recipeIngredients %}
                 <li>
                     {{ recipeIngredient.ingredient.name }}
@@ -35,6 +40,14 @@
             {% endfor %}
             </ul>
         </div>
+
+        <div class="card-body steps">
+            {% for recipeStep in recipe.recipeSteps %}
+                <h2 class="fs-3 pb-1 mt-3">{{ loop.index }}. {{ recipeStep.title }}</h2>
+                <p>{{ recipeStep.description|nl2br }}</p>
+            {% endfor %}
+        </div>
+
         <div class="card-footer">
             <a class="btn btn-primary"
                href="{{ path('app_recipe_edit', {'id': recipe.id}) }}"

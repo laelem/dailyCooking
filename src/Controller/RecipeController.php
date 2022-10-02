@@ -91,7 +91,7 @@ class RecipeController extends AbstractController
     #[Route('/{id}', name: 'app_recipe_show', methods: ['GET'])]
     public function show(int $id): Response
     {
-        $recipe = $this->repository->findWithIngredients($id);
+        $recipe = $this->repository->findWithIngredientsAndSteps($id);
 
         if (null === $recipe) {
             throw $this->createNotFoundException("Aucune recette trouvée pour l'id ".$id);
@@ -110,7 +110,7 @@ class RecipeController extends AbstractController
         RecipeStepRepository $recipeStepRepository,
     ): Response
     {
-        $recipe = $this->repository->findWithIngredients($id);
+        $recipe = $this->repository->findWithIngredientsAndSteps($id);
 
         if (null === $recipe) {
             throw $this->createNotFoundException("Aucune recette trouvée pour l'id ".$id);
