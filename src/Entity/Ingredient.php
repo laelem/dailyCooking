@@ -50,10 +50,14 @@ class Ingredient
     #[ORM\ManyToOne(inversedBy: 'ingredients')]
     private ?QuantityType $defaultQuantityType = null;
 
+    #[ORM\OneToMany(mappedBy: 'ingredient', targetEntity: StockIngredient::class)]
+    private Collection $stockIngredients;
+
     public function __construct()
     {
         $this->recipeIngredients = new ArrayCollection();
         $this->tags = new ArrayCollection();
+        $this->stockIngredients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -183,5 +187,35 @@ class Ingredient
     public function __toString()
     {
         return $this->name;
+    }
+
+    /**
+     * @return Collection<int, StockIngredient>
+     */
+    public function getStockIngredients(): Collection
+    {
+        return $this->stockIngredients;
+    }
+
+    public function addStockIngredient(StockIngredient $stockIngredient): self
+    {
+        if (!$this->stockIngredients->contains($stockIngredient)) {
+            $this->stockIngredients->add($stockIngredient);
+            $stockIngredient->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStockIngredient(StockIngredient $stockIngredient): self
+    {
+        if ($this->stockIngredients->removeElement($stockIngredient)) {
+            // set the owning side to null (unless already changed)
+            if ($stockIngredient->getIngredient() === $this) {
+                $stockIngredient->setIngredient(null);
+            }
+        }
+
+        return $this;
     }
 }
