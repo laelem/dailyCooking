@@ -23,7 +23,7 @@ class StockIngredient
     #[ORM\ManyToOne]
     private ?QuantityType $quantityType = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true, options: ["unsigned" => true])]
     private ?string $quantityNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]

@@ -43,7 +43,16 @@
 
         <div class="card-body steps">
             {% for recipeStep in recipe.recipeSteps %}
-                <h2 class="fs-3 pb-1 mt-3">{{ loop.index }}. {{ recipeStep.title }}</h2>
+                {% if recipe.recipeSteps|length > 1 %}
+                <h2 class="fs-3 pb-1 mt-3">
+                    {% if recipeStep.title is null %}
+                        Étape {{ loop.index }}
+                    {% else %}
+                        {{ loop.index }}. {{ recipeStep.title }}
+                    {% endif %}
+                </h2>
+                {% endif %}
+
                 <p>{{ recipeStep.description|nl2br }}</p>
             {% endfor %}
         </div>

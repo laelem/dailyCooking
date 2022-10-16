@@ -63,11 +63,7 @@ class RecipeController extends AbstractController
     #[Route('/new', name: 'app_recipe_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
-        $recipe = (new Recipe())
-            ->addRecipeStep(
-                (new RecipeStep())->setTitle('Étape 1')
-            )
-        ;
+        $recipe = (new Recipe())->addRecipeStep((new RecipeStep()));
 
         foreach (range(0, 2) as $index) {
             $recipe->addRecipeIngredient(new RecipeIngredient());

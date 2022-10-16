@@ -16,6 +16,7 @@ class RecipeStepType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'label' => "Titre de l'étape",
+                'required' => false,
                 'label_attr' => ['class' => 'visually-hidden'],
                 'row_attr' => ['class' => 'my-1'],
                 'attr' => ['class' => 'form-control-sm'],
