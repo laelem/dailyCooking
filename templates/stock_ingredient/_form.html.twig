@@ -1,0 +1,21 @@
+{{ form_start(form) }}
+<div class="card">
+    <div class="card-header">
+        <h1 class="display-6">Nouvel ingrédient en stock</h1>
+    </div>
+    <div class="card-body">
+        {{ form_errors(form) }}
+
+        {{ form_row(form.ingredient) }}
+        {{ form_row(form.quantityNumber) }}
+        {{ form_row(form.quantityType) }}
+        {{ form_row(form.expiresAt) }}
+        {{ form_row(form.stockStatus) }}
+        {{ form_row(form.comment) }}
+    </div>
+    <div class="card-footer">
+        {{ form_widget(form.save) }}
+        <a class="btn btn-secondary" href="{{ path('app_stock_ingredient_index') }}" role="button">Retour</a>
+    </div>
+</div>
+{{ form_end(form) }}

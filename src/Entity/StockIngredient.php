@@ -3,14 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\StockIngredientRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StockIngredientRepository::class)]
 class StockIngredient
 {
+    const STOCK_STATUS_OPTIONS = [
+        'soon_out_of_stock' => 'Bientôt épuisé(e)',
+        'out_of_stock' => 'Épuisé(e)',
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -114,5 +117,13 @@ class StockIngredient
         $this->stockStatus = $stockStatus;
 
         return $this;
+    }
+
+    public static function getStockStatusOptions(): array
+    {
+        return array_flip(array_merge(
+            ['' => '-'],
+            self::STOCK_STATUS_OPTIONS
+        ));
     }
 }
