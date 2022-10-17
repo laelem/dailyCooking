@@ -36,17 +36,37 @@
                     <th scope="col">Quantité</th>
                     <th scope="col">Date d'expiration</th>
                     <th scope="col">Statut</th>
+                    <th scope="col">Commentaire</th>
                     <th scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for stockIngredient in stockIngredients %}
                     <tr>
-                        <td>catégorie</td>
+                        <td>{{ stockIngredient.ingredient.category.name }}</td>
                         <td>{{ stockIngredient.ingredient.name }}</td>
-                        <td>{{ stockIngredient.quantityNumber }}</td>
-                        <td>{{ stockIngredient.expiresAt }}</td>
-                        <td>{{ stockIngredient.stockStatus }}</td>
+                        <td>
+                            {% if stockIngredient.quantityNumber is not null %}
+                                {{ stockIngredient.quantityNumber|format_number }}
+                                {% if stockIngredient.quantityType is not null %}
+                                    {%
+                                        if stockIngredient.quantityNumber > 1
+                                        and stockIngredient.quantityType.pluralName is not null
+                                    %}
+                                        {{ stockIngredient.quantityType.pluralName }}
+                                    {% else %}
+                                        {{ stockIngredient.quantityType.name }}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>{{ stockIngredient.expiresAt ? stockIngredient.expiresAt|date('d-m-Y') : '' }}</td>
+                        <td>
+                            {% if stockIngredient.stockStatus is not null %}
+                                <span class="badge bg-danger fs-6 fw-normal">{{ stockIngredient.stockStatusLabel }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ stockIngredient.comment }}</td>
                         <td>
 {#                            <a class="btn btn-sm btn-outline-secondary"#}
 {#                               href="{{ path('app_ingredient_tag_edit', {'id': tag.id}) }}"#}

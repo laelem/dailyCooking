@@ -126,4 +126,13 @@ class StockIngredient
             self::STOCK_STATUS_OPTIONS
         ));
     }
+
+    public function getStockStatusLabel(): ?string
+    {
+        if ($this->stockStatus) {
+            return self::STOCK_STATUS_OPTIONS[$this->stockStatus];
+        }
+
+        return null;
+    }
 }
