@@ -85,10 +85,10 @@ class Ingredient
 
     public static function getWhereToKeepOptions(): array
     {
-        return array_flip(array_merge(
-          ['' => 'Je ne sais pas'],
-          self::WHERE_TO_KEEP_OPTIONS
-        ));
+        return array_merge(
+            ['Je ne sais pas' => null],
+            array_flip(self::WHERE_TO_KEEP_OPTIONS)
+        );
     }
 
     public function getWhereToKeepLabel(): ?string

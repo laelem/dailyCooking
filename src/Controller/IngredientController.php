@@ -44,7 +44,6 @@ class IngredientController extends AbstractController
         );
 
         return $this->render('ingredient/index.html.twig', [
-            'ingredients'        => $this->repository->findAll(),
             'pagination'         => $pagination,
             'numItemsPerPage'    => $numItemsPerPage,
             'perPageOptions'     => self::PER_PAGE_OPTIONS,

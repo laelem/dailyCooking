@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\IngredientFilters;
 use App\Entity\StockIngredient;
+use App\Entity\StockIngredientFilters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,28 +42,42 @@ class StockIngredientRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return StockIngredient[] Returns an array of StockIngredient objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findAllQuery(StockIngredientFilters $stockIngredientFilters): Query
+    {
+        $qb = $this->createQueryBuilder('si')
+            ->addSelect('si.stockStatus as HIDDEN initSortStockStatus')
+            ->addSelect('si.expiresAt as HIDDEN initSortExpiresAt')
+            ->addSelect('i.name as HIDDEN initSortIngredientName')
+            ->addSelect('CASE WHEN si.expiresAt IS NULL THEN 1 ELSE 0 END as HIDDEN initSortExpiresAtIsNull')
+            ->addSelect('CASE WHEN si.stockStatus IS NULL THEN 1 ELSE 0 END as HIDDEN initSortStockStatusIsNull')
+            ->addSelect('CASE WHEN si.expiresAt IS NULL THEN 1 ELSE 0 END as HIDDEN expiresAtIsNull')
+            ->addSelect('CASE WHEN si.stockStatus IS NULL THEN 1 ELSE 0 END as HIDDEN stockStatusIsNull')
+            ->innerJoin('si.ingredient', 'i')
+            ->innerJoin('i.category', 'c')
+        ;
 
-//    public function findOneBySomeField($value): ?StockIngredient
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $parameters = [];
+
+        if ($stockIngredientFilters->getName()) {
+            $qb->andWhere('i.name LIKE :filterName');
+            $parameters['filterName'] = '%'.$stockIngredientFilters->getName().'%';
+        }
+
+        if ($stockIngredientFilters->getCategory()) {
+            $qb->andWhere('c.id = :filterCategoryId');
+            $parameters['filterCategoryId'] = $stockIngredientFilters->getCategory()->getId();
+        }
+
+        $qb->setParameters($parameters)
+            ->groupBy('si.id')
+            ->addOrderBy('initSortStockStatusIsNull')
+            ->addOrderBy('initSortStockStatus')
+            ->addOrderBy('initSortExpiresAtIsNull')
+            ->addOrderBy('initSortExpiresAt')
+            ->addOrderBy('c.position')
+            ->addOrderBy('initSortIngredientName')
+        ;
+
+        return $qb->getQuery();
+    }
 }

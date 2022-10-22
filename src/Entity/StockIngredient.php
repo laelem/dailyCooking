@@ -130,10 +130,10 @@ class StockIngredient
 
     public static function getStockStatusOptions(): array
     {
-        return array_flip(array_merge(
-            ['' => '-'],
-            self::STOCK_STATUS_OPTIONS
-        ));
+        return array_merge(
+            ['-' => null],
+            array_flip(self::STOCK_STATUS_OPTIONS)
+        );
     }
 
     public function getStockStatusLabel(): ?string

@@ -20,6 +20,9 @@ require('select2');
 import 'select2/dist/css/select2.min.css';
 
 $(document).ready(function() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
     $('.select2').select2();
 
     // hack to fix jquery 3.6 focus security patch that bugs auto search in select-2

@@ -3,92 +3,124 @@
 {% block title %}Liste des ingrédients en stock{% endblock %}
 
 {% block content %}
-    <div class="row row-cols-auto align-items-center">
-        <div class="col">
-            <h1 class="display-6">Liste des ingrédients en stock</h1>
-        </div>
-        <div class="col">
-            <a class="btn btn-sm btn-outline-primary" href="{{ path('app_stock_ingredient_new') }}" role="button">
-                Nouvel ingrédient
-            </a>
+<div class="row row-cols-auto align-items-center">
+    <div class="col">
+        <h1 class="display-6">Liste des ingrédients en stock</h1>
+    </div>
+    <div class="col">
+        <a class="btn btn-sm btn-outline-primary" href="{{ path('app_stock_ingredient_new') }}" role="button">
+            Nouvel ingrédient
+        </a>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col">
+        <div class="card text-bg-light my-2">
+            <div class="card-body">
+                {{ include('stock_ingredient/_filters.html.twig') }}
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="row mt-2 mb-3">
-        <div class="col">
-            {% if stockIngredients|length == 0 %}
-                Aucun ingrédient trouvé
-            {% elseif stockIngredients|length == 1 %}
-                1 ingrédient trouvé
-            {% else %}
-                {{ stockIngredients|length }} ingrédients trouvés
-            {% endif %}
-        </div>
+<div class="row mt-2 mb-3 align-items-center">
+    <div class="col">
+        {% if pagination.getTotalItemCount == 0 %}
+            Aucun ingrédient trouvé
+        {% elseif pagination.getTotalItemCount == 1 %}
+            1 ingrédient trouvé
+        {% else %}
+            {{ pagination.getTotalItemCount|number_format }} ingrédients trouvés
+        {% endif %}
     </div>
+    <div class="col text-end">
+        {{ include('stock_ingredient/_items_per_page.html.twig') }}
+    </div>
+</div>
 
-    <div class="row">
-        <div class="col">
-            <table class="table table-hover align-middle table-bordered">
-                <thead class="table-light">
+<div class="row">
+    <div class="col">
+        <table class="table table-hover align-middle table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th scope="col" {% if pagination.isSorted('c.name') %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, 'Catégorie', 'c.name') }}
+                </th>
+                <th scope="col" {% if pagination.isSorted('i.name') %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, 'Nom', 'i.name') }}
+                </th>
+                <th scope="col">Quantité</th>
+                <th scope="col" {% if pagination.isSorted(['expiresAtIsNull', 'si.expiresAt']) %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, "Date d'expiration", ['expiresAtIsNull', 'si.expiresAt']) }}
+                </th>
+                <th scope="col" {% if pagination.isSorted(['stockStatusIsNull', 'si.stockStatus']) %}class="sorted"{% endif %}>
+                    {{ knp_pagination_sortable(pagination, "Statut", ['stockStatusIsNull', 'si.stockStatus']) }}
+                </th>
+                <th scope="col">Commentaire</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stockIngredient in pagination %}
                 <tr>
-                    <th scope="col">Catégorie</th>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Quantité</th>
-                    <th scope="col">Date d'expiration</th>
-                    <th scope="col">Statut</th>
-                    <th scope="col">Commentaire</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for stockIngredient in stockIngredients %}
-                    <tr>
-                        <td>{{ stockIngredient.ingredient.category.name }}</td>
-                        <td>{{ stockIngredient.ingredient.name }}</td>
-                        <td>
-                            {% if stockIngredient.quantityNumber is not null %}
-                                {{ stockIngredient.quantityNumber|format_number }}
-                                {% if stockIngredient.quantityType is not null %}
-                                    {%
-                                        if stockIngredient.quantityNumber > 1
-                                        and stockIngredient.quantityType.pluralName is not null
-                                    %}
-                                        {{ stockIngredient.quantityType.pluralName }}
-                                    {% else %}
-                                        {{ stockIngredient.quantityType.name }}
-                                    {% endif %}
+                    <td>{{ stockIngredient.ingredient.category.name }}</td>
+                    <td>{{ stockIngredient.ingredient.name }}</td>
+                    <td>
+                        {% if stockIngredient.quantityNumber is not null %}
+                            {{ stockIngredient.quantityNumber|format_number }}
+                            {% if stockIngredient.quantityType is not null %}
+                                {%
+                                    if stockIngredient.quantityNumber > 1
+                                    and stockIngredient.quantityType.pluralName is not null
+                                %}
+                                    {{ stockIngredient.quantityType.pluralName }}
+                                {% else %}
+                                    {{ stockIngredient.quantityType.name }}
                                 {% endif %}
                             {% endif %}
-                        </td>
-                        <td>{{ stockIngredient.expiresAt ? stockIngredient.expiresAt|remainingDate ~ ' - ' ~ stockIngredient.expiresAt|date('d-m-Y') : '' }}</td>
-                        <td>
-                            {% if stockIngredient.stockStatus is not null %}
-                                <span class="badge bg-danger fs-6 fw-normal">{{ stockIngredient.stockStatusLabel }}</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ stockIngredient.comment }}</td>
-                        <td>
-                            <a class="btn btn-sm btn-outline-secondary"
-                               href="{{ path('app_stock_ingredient_edit', {'id': stockIngredient.id}) }}"
-                            >
-                                modifier
-                            </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                    data-bs-target="#modalDeleteStockIngredient{{ stockIngredient.id }}"
-                            >
-                                supprimer
-                            </button>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stockIngredient.expiresAt is not null %}
+                            {{ stockIngredient.expiresAt|alertRemainingDate|raw }}
+                            {{ stockIngredient.expiresAt|remainingDate }}
+                            <span class="text-secondary fw-light">({{ stockIngredient.expiresAt|date('d/m/Y') }})</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stockIngredient.stockStatus is not null %}
+                            <span class="badge bg-danger fs-6 fw-normal">{{ stockIngredient.stockStatusLabel }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ stockIngredient.comment }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           href="{{ path('app_stock_ingredient_edit', {'id': stockIngredient.id}) }}"
+                        >
+                            modifier
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#modalDeleteStockIngredient{{ stockIngredient.id }}"
+                        >
+                            supprimer
+                        </button>
 
-                            {{ include('stock_ingredient/_delete_form.html.twig', {'stockIngredient': stockIngredient}) }}
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="6">Aucun ingrédient trouvé</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                        {{ include('stock_ingredient/_delete_form.html.twig', {'stockIngredient': stockIngredient}) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">Aucun ingrédient trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="navigation">
+            {{ knp_pagination_render(pagination) }}
         </div>
     </div>
+</div>
 {% endblock %}

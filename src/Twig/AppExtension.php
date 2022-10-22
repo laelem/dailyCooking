@@ -12,6 +12,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('remainingDate', [$this, 'remainingDate']),
+            new TwigFilter('alertRemainingDate', [$this, 'alertRemainingDate']),
         ];
     }
 
@@ -38,5 +39,16 @@ class AppExtension extends AbstractExtension
         }
 
         return sprintf('Périme dans %s mois', floor($diff->days/30));
+    }
+
+    public function alertRemainingDate(DateTime $date): string
+    {
+        $diff = (new DateTime())->setTime(0, 0)->diff($date->setTime(0, 0));
+
+        if (1 === $diff->invert || $diff->days <= 3) {
+            return '<i class="fa-solid fa-circle-exclamation text-danger"></i>';
+        }
+
+        return '';
     }
 }
