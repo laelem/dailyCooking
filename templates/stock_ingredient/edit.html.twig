@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un ingrédient en stock{% endblock %}
+
+{% block content %}
+    {{ include('stock_ingredient/_form.html.twig', {
+        'title': 'Modifier un ingrédient',
+        'submit_label': 'Modifier'
+    }) }}
+{% endblock %}

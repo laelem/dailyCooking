@@ -37,6 +37,7 @@ class Ingredient
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: 'La catégorie est requise.')]
     #[Assert\Type(type: IngredientCategory::class, message: "Cette valeur n'est pas du bon type.")]
+    #[Assert\Valid]
     private ?IngredientCategory $category = null;
 
     #[ORM\ManyToMany(targetEntity: IngredientTag::class, inversedBy: 'ingredients')]

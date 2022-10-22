@@ -1,7 +1,7 @@
 {{ form_start(form) }}
 <div class="card">
     <div class="card-header">
-        <h1 class="display-6">Nouvel ingrédient en stock</h1>
+        <h1 class="display-6">{{ title }}</h1>
     </div>
     <div class="card-body">
         {{ form_errors(form) }}
@@ -20,7 +20,7 @@
         {{ form_row(form.comment) }}
     </div>
     <div class="card-footer">
-        {{ form_widget(form.save) }}
+        {{ form_widget(form.save, {'label': submit_label}) }}
         <a class="btn btn-secondary" href="{{ path('app_stock_ingredient_index') }}" role="button">Retour</a>
     </div>
 </div>

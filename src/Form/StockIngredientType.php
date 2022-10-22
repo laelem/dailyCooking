@@ -44,7 +44,7 @@ class StockIngredientType extends AbstractType
             ->add('expiresAt', DateType::class, [
                 'label' => "Date d'expiration",
                 'required' => false,
-                'years' => range(date('Y')-1, date('Y')+6),
+                'years' => range(intval(date('Y'))-1, intval(date('Y'))+6),
             ])
             ->add('stockStatus', ChoiceType::class, [
                 'label' => 'Statut',
@@ -55,9 +55,7 @@ class StockIngredientType extends AbstractType
                 'label' => 'Commentaire',
                 'required' => false,
             ])
-            ->add('save', SubmitType::class, [
-                'label' => 'Sauvegarder',
-            ])
+            ->add('save', SubmitType::class)
         ;
     }
 

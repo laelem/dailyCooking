@@ -22,7 +22,7 @@ class QuantityType
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotBlank(message: "Le nom du type de quantité au pluriel ne peut pas être vide.", normalizer: 'trim')]
+    #[Assert\NotBlank(message: "Le nom du type de quantité au pluriel ne peut pas être vide.", allowNull: true, normalizer: 'trim')]
     #[Assert\Length(max: 255, maxMessage: "Le nom du type de quantité au pluriel ne peut excéder 255 caractères.")]
     private ?string $pluralName = null;
 

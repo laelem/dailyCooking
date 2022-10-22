@@ -49,4 +49,31 @@ class StockIngredientController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_stock_ingredient_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, StockIngredient $stockIngredient): Response
+    {
+        $form = $this->createForm(StockIngredientType::class, $stockIngredient);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repository->add($stockIngredient, true);
+
+            return $this->redirectToRoute('app_stock_ingredient_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('stock_ingredient/edit.html.twig', [
+            'stockIngredient' => $stockIngredient,
+            'form'            => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_stock_ingredient_delete', methods: ['POST'])]
+    public function delete(Request $request, StockIngredient $stockIngredient): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$stockIngredient->getId(), $request->request->get('_token'))) {
+            $this->repository->remove($stockIngredient, true);
+        }
+
+        return $this->redirectToRoute('app_stock_ingredient_index', [], Response::HTTP_SEE_OTHER);
+    }
 }
