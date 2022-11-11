@@ -2,22 +2,29 @@
 
 namespace App\Controller;
 
+use App\Entity\AddRecipePortionNumber;
 use App\Entity\Recipe;
 use App\Entity\RecipeFilters;
 use App\Entity\RecipeIngredient;
+use App\Entity\RecipeIngredientPortionNumber;
+use App\Entity\RecipePortionNumber;
 use App\Entity\RecipeStep;
+use App\Form\AddRecipePortionNumberType;
 use App\Form\RecipeFiltersType;
+use App\Form\RecipeIngredientPortionNumberType;
+use App\Form\RecipeByPortionType;
+use App\Form\RecipePortionNumberType;
 use App\Form\RecipeType;
-use App\Repository\IngredientRepository;
+use App\Repository\RecipeIngredientPortionNumberRepository;
 use App\Repository\RecipeIngredientRepository;
 use App\Repository\RecipeRepository;
 use App\Repository\RecipeStepRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/recipe')]
@@ -27,10 +34,15 @@ class RecipeController extends AbstractController
     const DEFAULT_PER_PAGE_OPTION = 25;
 
     private RecipeRepository $repository;
+    private RecipeIngredientPortionNumberRepository $recipeIngredientPortionNumberRepository;
 
-    public function __construct(RecipeRepository $repository)
+    public function __construct(
+        RecipeRepository $repository,
+        RecipeIngredientPortionNumberRepository $recipeIngredientPortionNumberRepository
+    )
     {
         $this->repository = $repository;
+        $this->recipeIngredientPortionNumberRepository = $recipeIngredientPortionNumberRepository;
     }
 
     #[Route('/', name: 'app_recipe_index', methods: ['GET'])]
@@ -154,6 +166,93 @@ class RecipeController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$recipe->getId(), $request->request->get('_token'))) {
             $this->repository->remove($recipe, true);
+        }
+
+        return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/add-portion-number', name: 'app_recipe_add_portion_number', methods: ['GET', 'POST'])]
+    public function addPortionNumber(Request $request, Recipe $recipe): Response
+    {
+        $addRecipePortionNumber =  new AddRecipePortionNumber();
+
+        $form = $this->createForm(AddRecipePortionNumberType::class, $addRecipePortionNumber);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $portionNumber = $addRecipePortionNumber->getPortionNumber();
+
+            foreach($recipe->getRecipeIngredients() as $recipeIngredient) {
+                $recipeIngredientPortionNumber = (new RecipeIngredientPortionNumber())
+                    ->setRecipeIngredient($recipeIngredient)
+                    ->setPortionNumber($portionNumber)
+                ;
+
+                $this->recipeIngredientPortionNumberRepository->add($recipeIngredientPortionNumber, true);
+            }
+
+            return $this->redirectToRoute(
+                'app_recipe_manage_portion_number',
+                [
+                    'id'                     => $recipe->getId(),
+                    'default-portion-number' => $portionNumber,
+                ],
+                Response::HTTP_SEE_OTHER
+            );
+        }
+
+        return $this->renderForm('recipe/add_portion_number.html.twig', [
+            'recipe' => $recipe,
+            'form'   => $form,
+        ]);
+    }
+
+    #[Route('/{id}/manage-portion-number', name: 'app_recipe_manage_portion_number', methods: ['GET', 'POST'])]
+    public function managePortionNumber(Recipe $recipe, Request $request): Response
+    {
+        $defaultPortionNumber = (int) $request->query->get('default-portion-number');
+
+        $recipe->hydratePortions();
+
+        if ($recipe->getPortions()->count() === 0) {
+            throw new BadRequestHttpException("Cette recette n'a pas de portions.");
+        }
+
+        if (0 === $defaultPortionNumber || !in_array($defaultPortionNumber, $recipe->getPortionNumberList())) {
+            $defaultPortionNumber = array_key_first($recipe->getPortionNumberList());
+        }
+
+        $form = $this->createForm(RecipeByPortionType::class, $recipe);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repository->add($recipe, true);
+
+            return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('recipe/manage_portion_number.html.twig', [
+            'recipe'               => $recipe,
+            'form'                 => $form,
+            'defaultPortionNumber' => $defaultPortionNumber,
+        ]);
+    }
+
+    #[Route('/{id}/delete-portion-number/{portionNumber}', name: 'app_recipe_delete_portion_number', methods: ['POST'])]
+    public function deletePortionNumber(Request $request, Recipe $recipe, int $portionNumber): Response
+    {
+        $tokenName = sprintf('delete%sportionNumber%s', $recipe->getId(), $portionNumber);
+
+        if ($this->isCsrfTokenValid($tokenName, $request->request->get('_token'))) {
+            foreach ($recipe->getRecipeIngredients() as $recipeIngredient) {
+                foreach($recipeIngredient->getPortionNumbers() as $recipeIngredientPortionNumber) {
+                    if ($recipeIngredientPortionNumber->getPortionNumber() == $portionNumber) {
+                        $this->recipeIngredientPortionNumberRepository->remove($recipeIngredientPortionNumber, true);
+                    }
+                }
+            }
         }
 
         return $this->redirectToRoute('app_recipe_index', [], Response::HTTP_SEE_OTHER);

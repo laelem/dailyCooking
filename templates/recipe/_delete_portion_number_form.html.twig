@@ -1,0 +1,23 @@
+<div class="modal fade" id="modalDeletePortionNumber{{ portionNumber }}" tabindex="-1"
+     aria-labelledby="Supprimer un nombre de portions" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Supprimer un nombre de portions">Suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                Supprimer le nombre de portions "{{ portionNumber }}" pour la recette "{{ recipe.title }}" ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post"
+                      action="{{ path('app_recipe_delete_portion_number', {'id': recipe.id, 'portionNumber': portionNumber}) }}"
+                >
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recipe.id ~ 'portionNumber' ~ portionNumber) }}">
+                    <button class="btn btn-primary">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

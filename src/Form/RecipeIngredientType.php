@@ -29,31 +29,6 @@ class RecipeIngredientType extends AbstractType
                 'row_attr' => ['class' => 'my-1'],
                 'attr' => ['class' => 'select2'],
             ])
-            ->add('quantityNumber', NumberType::class, [
-                'label' => 'Quantité',
-                'label_attr' => ['class' => 'visually-hidden'],
-                'required' => false,
-                'row_attr' => ['class' => 'my-1'],
-                'attr' => ['class' => 'form-control-sm'],
-            ])
-            ->add('quantityType', EntityType::class, [
-                'label' => 'Mesure',
-                'label_attr' => ['class' => 'visually-hidden'],
-                'required' => false,
-                'class' => QuantityType::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('q')->orderBy('q.name', 'ASC');
-                },
-                'row_attr' => ['class' => 'my-1'],
-                'attr' => ['class' => 'form-select-sm'],
-            ])
-            ->add('comment', TextType::class, [
-                'label' => 'Commentaire',
-                'label_attr' => ['class' => 'visually-hidden'],
-                'required' => false,
-                'row_attr' => ['class' => 'my-1'],
-                'attr' => ['class' => 'form-control-sm'],
-            ])
         ;
     }
 

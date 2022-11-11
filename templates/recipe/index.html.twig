@@ -45,6 +45,9 @@
                     <th scope="col" {% if pagination.isSorted('r.title') %}class="sorted"{% endif %}>
                         {{ knp_pagination_sortable(pagination, 'Recette', 'r.title') }}
                     </th>
+{#                    <th>#}
+{#                        Nombre de portions#}
+{#                    </th>#}
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -52,6 +55,7 @@
             {% for recipe in pagination %}
                 <tr>
                     <td>{{ recipe.title }}</td>
+{#                    <td>{{ recipe.portionNumberList|join(', ') }}</td>#}
                     <td>
                         <a class="btn btn-sm btn-outline-primary"
                            href="{{ path('app_recipe_show', {'id': recipe.id}) }}"
@@ -63,12 +67,28 @@
                         >
                             modifier
                         </a>
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Portions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_recipe_manage_portion_number', {'id': recipe.id}) }}">
+                                        Gérer les portions
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_recipe_add_portion_number', {'id': recipe.id}) }}">
+                                        Ajouter un nombre de portions
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                         <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
                                 data-bs-target="#modalDeleteRecipe{{ recipe.id }}"
                         >
                             supprimer
                         </button>
-
                         {{ include('recipe/_delete_form.html.twig', {'recipe': recipe}) }}
                     </td>
                 </tr>

@@ -1,10 +1,7 @@
 {% import _self as formMacros %}
 
 {% macro printRecipeIngredientRow(recipeIngredient) %}
-    <div class="col-2 pe-1">{{ form_row(recipeIngredient.ingredient) }}</div>
-    <div class="col-1 px-1">{{ form_row(recipeIngredient.quantityNumber) }}</div>
-    <div class="col-2 px-1">{{ form_row(recipeIngredient.quantityType) }}</div>
-    <div class="col-2 px-1">{{ form_row(recipeIngredient.comment) }}</div>
+    <div class="col-7 pe-1">{{ form_row(recipeIngredient.ingredient) }}</div>
     <div class="col-1 px-1">
         <div class="d-grid">
             <button type="button" class="btn btn-danger btn-sm subformDeleteButton">Supprimer</button>
@@ -31,14 +28,10 @@
         {{ form_errors(form) }}
 
         {{ form_row(form.title) }}
-        {{ form_row(form.defaultPortionNumber) }}
     </div>
     <div class="card-body ingredients">
         <div class="row align-items-center">
-            <div class="col-2 pe-1">Ingrédient</div>
-            <div class="col-1 px-1">Quantité</div>
-            <div class="col-2 px-1">Unité de mesure</div>
-            <div class="col-7 px-1">Commentaire</div>
+            <div class="col-8 pe-1">Ingrédients</div>
         </div>
 
         <div

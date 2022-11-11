@@ -12,8 +12,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
 {
-    const PORTION_MAX = 20;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,19 +23,20 @@ class Recipe
     #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeIngredient::class, cascade: ['persist', 'remove'])]
     private Collection $recipeIngredients;
 
-    #[ORM\Column(type: Types::SMALLINT, nullable: true, options: ["unsigned" => true])]
-    #[Assert\Type(type: 'integer', message: 'Le nombre de portions doit être un nombre.')]
-    #[Assert\Positive(message: "Le nombre de portions doit être un nombre positif.")]
-    #[Assert\LessThanOrEqual(value: self::PORTION_MAX, message: "Le nombre de portions ne peut excéder {{ compared_value }}.")]
-    private ?int $defaultPortionNumber = null;
-
     #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeStep::class, cascade: ['persist', 'remove'])]
     private Collection $recipeSteps;
+
+    /**
+     * @var Collection<int, RecipePortionNumber>
+     */
+    private Collection $portions;
 
     public function __construct()
     {
         $this->recipeIngredients = new ArrayCollection();
         $this->recipeSteps = new ArrayCollection();
+
+        $this->hydratePortions();
     }
 
     public function getId(): ?int
@@ -87,18 +86,6 @@ class Recipe
         return $this;
     }
 
-    public function getDefaultPortionNumber(): ?int
-    {
-        return $this->defaultPortionNumber;
-    }
-
-    public function setDefaultPortionNumber(?int $defaultPortionNumber): self
-    {
-        $this->defaultPortionNumber = $defaultPortionNumber;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, RecipeStep>
      */
@@ -127,5 +114,81 @@ class Recipe
         }
 
         return $this;
+    }
+
+    public function hydratePortions(): self
+    {
+        $ingredientsByPortions = [];
+
+        foreach ($this->getRecipeIngredients() as $recipeIngredient) {
+            foreach($recipeIngredient->getPortionNumbers() as $recipeIngredientPortionNumber) {
+                if (!isset($ingredientsByPortions[$recipeIngredientPortionNumber->getPortionNumber()])) {
+                    $ingredientsByPortions[$recipeIngredientPortionNumber->getPortionNumber()] = [];
+                }
+                $ingredientsByPortions[$recipeIngredientPortionNumber->getPortionNumber()][] = $recipeIngredientPortionNumber;
+            }
+        }
+
+        $this->setPortions(new ArrayCollection());
+        foreach ($ingredientsByPortions as $portionNumber => $ingredientsByPortion) {
+            $recipePortionNumber = (new RecipePortionNumber())->setPortionNumber($portionNumber);
+            foreach ($ingredientsByPortion as $ingredient) {
+                $recipePortionNumber->addRecipeIngredientPortionNumber($ingredient);
+            }
+            $this->addPortion($recipePortionNumber);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecipePortionNumber>
+     */
+    public function getPortions(): Collection
+    {
+        return $this->portions;
+    }
+
+    /**
+     * @param Collection<int, RecipePortionNumber> $portions
+     * @return Recipe
+     */
+    public function setPortions(Collection $portions): self
+    {
+        $this->portions = $portions;
+
+        return $this;
+    }
+
+    public function addPortion(RecipePortionNumber $portion): self
+    {
+        if (!$this->portions->contains($portion)) {
+            $this->portions->add($portion);
+            $portion->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removePortion(RecipePortionNumber $portion): self
+    {
+        if ($this->portions->removeElement($portion)) {
+            // set the owning side to null (unless already changed)
+            if ($portion->getRecipe() === $this) {
+                $portion->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getPortionNumberList(): array
+    {
+        return $this->getPortions()->map(function(RecipePortionNumber $e) {
+            return $e->getPortionNumber();
+        })->toArray();
     }
 }

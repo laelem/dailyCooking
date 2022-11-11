@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\IngredientFilters;
 use App\Entity\Recipe;
 use App\Entity\RecipeFilters;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -44,7 +43,9 @@ class RecipeRepository extends ServiceEntityRepository
 
     public function findAllQuery(RecipeFilters $recipeFilters): Query
     {
-        $qb = $this->createQueryBuilder('r');
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.recipeIngredients', 'ri')
+            ->leftJoin('ri.portionNumbers', 'ripn');
 
         $parameters = [];
 

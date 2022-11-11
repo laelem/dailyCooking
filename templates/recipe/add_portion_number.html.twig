@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recette : {{ recipe.title }} - Ajouter un nombre de portions{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="display-6">Recette : {{ recipe.title }}</h1>
+        </div>
+        <div class="card-body">
+            {{ form_errors(form) }}
+
+            {{ form_row(form.portionNumber) }}
+        </div>
+        <div class="card-footer">
+            {{ form_widget(form.save) }}
+            <a class="btn btn-secondary" href="{{ path('app_recipe_index') }}" role="button">Retour</a>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

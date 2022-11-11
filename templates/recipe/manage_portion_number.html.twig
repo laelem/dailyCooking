@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recette : {{ recipe.title }} - Gérer les portions{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="display-6">Recette : {{ recipe.title }}</h1>
+        </div>
+        <div class="card-body">
+
+            <ul class="nav nav-tabs" id="tabPortions" role="tablist">
+                {% for portion in form.portions %}
+                    {% set portionNumber = portion.vars.value.portionNumber %}
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link {{ portionNumber == defaultPortionNumber ? 'active' : '' }}"
+                            id="portion-{{ portionNumber }}-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#portion-{{ portionNumber }}-tab-pane"
+                            type="button"
+                            role="tab"
+                            aria-controls="portion-{{ portionNumber }}-tab-pane"
+                            aria-selected="{{ portionNumber == defaultPortionNumber ? 'true' : 'false' }}"
+                        >
+                            Pour {{ portionNumber }} portion{{ portionNumber > 1 ? 's' : '' }}
+                        </button>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="tab-content pt-4" id="tabPortionsContent">
+                {% for portion in form.portions %}
+                    {% set portionNumber = portion.vars.value.portionNumber %}
+                    <div
+                        class="tab-pane fade {{ portionNumber == defaultPortionNumber ? 'show active' : '' }}"
+                        id="portion-{{ portionNumber }}-tab-pane"
+                        role="tabpanel"
+                        aria-labelledby="portion-{{ portionNumber }}-tab"
+                        tabindex="0"
+                    >
+                        <div class="row align-items-center">
+                            <div class="col-2 pe-2"></div>
+                            <div class="col-1 px-1">Quantité</div>
+                            <div class="col-2 px-1">Unité de mesure</div>
+                            <div class="col-7 px-1">Commentaire</div>
+                        </div>
+
+                        <div>
+                            {% for recipeIngredientPortionNumber in portion.recipeIngredientPortionNumberList %}
+                                <div class="row align-items-center">
+                                    <div class="col-2 pe-2 text-end">{{ recipeIngredientPortionNumber.vars.value.recipeIngredient.ingredient.name }}</div>
+                                    <div class="col-1 px-1">{{ form_row(recipeIngredientPortionNumber.quantityNumber) }}</div>
+                                    <div class="col-2 px-1">{{ form_row(recipeIngredientPortionNumber.quantityType) }}</div>
+                                    <div class="col-7 px-1">{{ form_row(recipeIngredientPortionNumber.comment) }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div>
+                            <div class="row align-items-center">
+                                <div class="col-2 pe-2"></div>
+                                <div class="col-3 px-1 pt-2">
+                                    <div class="d-grid">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#modalDeletePortionNumber{{ portionNumber }}"
+                                        >
+                                            Supprimer ce nombre de portions
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{
+                                include('recipe/_delete_portion_number_form.html.twig', {
+                                    'recipe': recipe,
+                                    'portionNumber': portionNumber
+                                })
+                            }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer">
+            {{ form_widget(form.save) }}
+            <a class="btn btn-secondary" href="{{ path('app_recipe_index') }}" role="button">Retour</a>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

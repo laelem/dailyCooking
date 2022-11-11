@@ -19,9 +19,6 @@ class RecipeType extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Titre',
             ])
-            ->add('defaultPortionNumber', IntegerType::class, [
-                'label' => 'Nombre de portions',
-            ])
             ->add('recipeIngredients', CollectionType::class, [
                 'label' => 'Ingrédients',
                 'label_attr' => ['class' => 'visually-hidden'],
